@@ -60,16 +60,10 @@ config.cfg
 *.tmp
 
 # ignore public libs 
-src/lib/public/mathlib.lib
-src/lib/public/raytrace.lib
-src/lib/public/tier1.lib
-src/lib/public/vgui_controls.lib
-src/lib/public/linux32/mathlib.lib
-src/lib/public/linux32/raytrace.lib
-src/lib/public/linux32/vgui_controls.lib
-src/lib/public/osx32/mathlib.lib
-src/lib/public/osx32/raytrace.lib
-src/lib/public/osx32/vgui_controls.lib
+mathlib.lib
+raytrace.lib
+tier1.lib
+vgui_controls.lib
 
 # VS2022 changes
 *.vpc.sentinel
