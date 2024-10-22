@@ -1,6 +1,10 @@
 # Files to ignore when considering what GIT should commit.
 
 # Visual Studio 
+.vs
+.vs/
+.vscode
+.vscode/
 *.suo
 *.user
 *.sln.docstates
@@ -18,6 +22,7 @@ ipch
 *.opensdf
 *.idb
 *.vcxproj
+*.vcxproj.filters
 *.sln
 
 # OSX/Linux build products
@@ -54,9 +59,21 @@ config.cfg
 # shader files
 *.tmp
 
+# ignore public libs 
+src/lib/public/mathlib.lib
+src/lib/public/raytrace.lib
+src/lib/public/tier1.lib
+src/lib/public/vgui_controls.lib
+src/lib/public/linux32/mathlib.lib
+src/lib/public/linux32/raytrace.lib
+src/lib/public/linux32/vgui_controls.lib
+src/lib/public/osx32/mathlib.lib
+src/lib/public/osx32/raytrace.lib
+src/lib/public/osx32/vgui_controls.lib
+
+# VS2022 changes
 *.vpc.sentinel
 *.vcxproj*
 [Dd]ebug*/
 [Rr]elease*/
 *.pdb
-.vs/
