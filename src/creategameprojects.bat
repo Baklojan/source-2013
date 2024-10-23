@@ -1,1 +1,1 @@
-devtools\bin\vpc.exe /hl2mp +game /mksln games.sln /define:VS2022
+devtools\bin\vpc.exe /hl2mp +game /mksln mp_2013.sln /define:VS2022
