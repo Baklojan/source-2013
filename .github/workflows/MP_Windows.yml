@@ -32,7 +32,7 @@ jobs:
         run: tar cJfv Windows.tar.xz game/mp_2013/bin
 
       - name: Upload product
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: mp_2013
           path: Windows.tar.xz
