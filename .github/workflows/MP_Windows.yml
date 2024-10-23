@@ -22,7 +22,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         
       - name: Create project
-        run: cd src;devtools/bin/vpc.exe  /2013 +game /mksln mp_2013.sln
+        run: cd src;devtools/bin/vpc.exe /hl2mp +game /mksln mp_2013.sln
 
       - name: Build project
         run: cd src;devenv mp_2013.sln /Build Release
