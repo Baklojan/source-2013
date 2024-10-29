@@ -17,9 +17,9 @@
 #include "hl2mp_player.h"
 #endif
 
-#define HL2MP_RUN_SPEED				320.0f
-#define HL2MP_WALK_SPEED			75.0f
-#define HL2MP_CROUCHWALK_SPEED		110.0f
+#define HL2MP_RUN_SPEED				270
+#define HL2MP_WALK_SPEED			180
+#define HL2MP_CROUCHWALK_SPEED		60
 
 //-----------------------------------------------------------------------------
 // Purpose: 

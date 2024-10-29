@@ -80,15 +80,15 @@ extern int gEvilImpulse101;
 ConVar sv_autojump( "sv_autojump", "0" );
 
 ConVar hl2_walkspeed( "hl2_walkspeed", "150" );
-ConVar hl2_normspeed( "hl2_normspeed", "190" );
-ConVar hl2_sprintspeed( "hl2_sprintspeed", "320" );
+ConVar hl2_normspeed( "hl2_normspeed", "180" );
+ConVar hl2_sprintspeed( "hl2_sprintspeed", "270" );
 
 ConVar hl2_darkness_flashlight_factor ( "hl2_darkness_flashlight_factor", "1" );
 
 #ifdef HL2MP
 	#define	HL2_WALK_SPEED 150
-	#define	HL2_NORM_SPEED 190
-	#define	HL2_SPRINT_SPEED 320
+	#define	HL2_NORM_SPEED 180
+	#define	HL2_SPRINT_SPEED 270
 #else
 	#define	HL2_WALK_SPEED hl2_walkspeed.GetFloat()
 	#define	HL2_NORM_SPEED hl2_normspeed.GetFloat()
@@ -427,7 +427,7 @@ void CHL2_Player::Precache( void )
 	BaseClass::Precache();
 
 	PrecacheScriptSound( "HL2Player.SprintNoPower" );
-	PrecacheScriptSound( "HL2Player.SprintStart" );
+	//PrecacheScriptSound( "HL2Player.SprintStart" );
 	PrecacheScriptSound( "HL2Player.UseDeny" );
 	PrecacheScriptSound( "HL2Player.FlashLightOn" );
 	PrecacheScriptSound( "HL2Player.FlashLightOff" );
@@ -892,6 +892,10 @@ void CHL2_Player::PreThink(void)
 			m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
 		}
 	}
+
+	// Stop sprinting if sprinting and holding down +back key or not holding down +forward key
+	if (IsSprinting() && ((m_nButtons & (IN_BACK)) || !(m_nButtons & (IN_FORWARD))))
+		StopSprinting();
 }
 
 void CHL2_Player::PostThink( void )
@@ -1193,7 +1197,7 @@ void CHL2_Player::StartAutoSprint()
 //-----------------------------------------------------------------------------
 void CHL2_Player::StartSprinting( void )
 {
-	if( m_HL2Local.m_flSuitPower < 10 )
+	/*if (m_HL2Local.m_flSuitPower < 10)
 	{
 		// Don't sprint unless there's a reasonable
 		// amount of suit power.
@@ -1206,14 +1210,18 @@ void CHL2_Player::StartSprinting( void )
 			EmitSound( filter, entindex(), "HL2Player.SprintNoPower" );
 		}
 		return;
-	}
+	}*/
+
+	// Do not sprint if not holding +forward key or holding +back key
+	if (!(m_nButtons & IN_FORWARD) || (m_nButtons & (IN_BACK)))
+		return;
 
 	if( !SuitPower_AddDevice( SuitDeviceSprint ) )
 		return;
 
-	CPASAttenuationFilter filter( this );
+	/*CPASAttenuationFilter filter(this);
 	filter.UsePredictionRules();
-	EmitSound( filter, entindex(), "HL2Player.SprintStart" );
+	EmitSound( filter, entindex(), "HL2Player.SprintStart" );*/
 
 	SetMaxSpeed( HL2_SPRINT_SPEED );
 	m_fIsSprinting = true;

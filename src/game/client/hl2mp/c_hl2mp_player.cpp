@@ -589,7 +589,7 @@ bool C_HL2MP_Player::CanSprint( void )
 //-----------------------------------------------------------------------------
 void C_HL2MP_Player::StartSprinting( void )
 {
-	if( m_HL2Local.m_flSuitPower < 10 )
+	/*if (m_HL2Local.m_flSuitPower < 10)
 	{
 		// Don't sprint unless there's a reasonable
 		// amount of suit power.
@@ -601,7 +601,7 @@ void C_HL2MP_Player::StartSprinting( void )
 
 	CPASAttenuationFilter filter( this );
 	filter.UsePredictionRules();
-	EmitSound( filter, entindex(), "HL2Player.SprintStart" );
+	EmitSound( filter, entindex(), "HL2Player.SprintStart" );*/
 
 	SetMaxSpeed( HL2_SPRINT_SPEED );
 	m_fIsSprinting = true;
