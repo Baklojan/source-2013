@@ -1921,11 +1921,11 @@ void CWeaponRPG::InitBeam( void )
 
 	if ( ShouldDrawUsingViewModel() )
 	{
-		CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
+		CBasePlayer * pPlayerOwner = ToBasePlayer( GetOwner() );
 		
-		if ( pOwner != NULL )
+		if ( pPlayerOwner  != NULL )
 		{
-			pEntity = pOwner->GetViewModel();
+			pEntity = pPlayerOwner->GetViewModel();
 		}
 	}
 	else
@@ -2256,8 +2256,8 @@ int CLaserDot::DrawModel( int flags )
 		{
 			// Take the eye position and direction
 			vecAttachment = pOwner->EyePosition();
-			QAngle angles = pOwner->EyeAngles();
-			AngleVectors( angles, &vecDir );
+			QAngle eyeangs = pOwner->EyeAngles();
+			AngleVectors( eyeangs, &vecDir );
 		}
 		
 		trace_t tr;
