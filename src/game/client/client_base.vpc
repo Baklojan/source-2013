@@ -501,6 +501,8 @@ $Project
 		$File	"weapon_selection.cpp"
 		$File	"weapons_resource.cpp"
 		$File	"WorldDimsProxy.cpp"
+		$File	"worldlight.cpp"
+		$File	"worldlight.h"
 		$File	"vgui_video.cpp"
 		$File   "vgui_video_player.cpp"
 		$File	"$SRCDIR\game\shared\mp_shareddefs.cpp"
