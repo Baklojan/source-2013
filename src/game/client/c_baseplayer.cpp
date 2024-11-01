@@ -413,6 +413,10 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 	m_vecOldViewAngles.Init();
 #endif
 
+	// Prevent clip with dynamic lights
+	ConVarRef r_flashlightscissor( "r_flashlightscissor" );
+	r_flashlightscissor.SetValue( "0" );
+
 	m_pFlashlight = NULL;
 
 	m_pCurrentVguiScreen = NULL;
