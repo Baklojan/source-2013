@@ -5927,6 +5927,11 @@ const char *Studio_GetDefaultSurfaceProps( CStudioHdr *pstudiohdr )
 
 float Studio_GetMass( CStudioHdr *pstudiohdr )
 {
+	if ( pstudiohdr == NULL )
+	{
+		return 0.f;
+	}
+
 	return pstudiohdr->mass();
 }
 
