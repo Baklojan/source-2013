@@ -161,7 +161,6 @@ void WeaponsResource::LoadWeaponSprites( WEAPON_FILE_INFO_HANDLE hWeaponFileInfo
 			pWeaponInfo->iconInactive = gHUD.AddUnsearchableHudIconToList( *p );
 			if ( pWeaponInfo->iconInactive )
 			{
-				pWeaponInfo->iconInactive->Precache();
 				pHudHR->SetHistoryGap( pWeaponInfo->iconInactive->Height() );
 			}
 		}
@@ -172,7 +171,6 @@ void WeaponsResource::LoadWeaponSprites( WEAPON_FILE_INFO_HANDLE hWeaponFileInfo
 			pWeaponInfo->iconActive = gHUD.AddUnsearchableHudIconToList( *p );
 			if ( pWeaponInfo->iconActive )
 			{
-				pWeaponInfo->iconActive->Precache();
 			}
 		}
 
@@ -182,7 +180,6 @@ void WeaponsResource::LoadWeaponSprites( WEAPON_FILE_INFO_HANDLE hWeaponFileInfo
 			pWeaponInfo->iconSmall = gHUD.AddUnsearchableHudIconToList( *p );
 			if ( pWeaponInfo->iconSmall )
 			{
-				pWeaponInfo->iconSmall->Precache();
 			}
 		}
 
@@ -192,7 +189,6 @@ void WeaponsResource::LoadWeaponSprites( WEAPON_FILE_INFO_HANDLE hWeaponFileInfo
 			pWeaponInfo->iconAmmo = gHUD.AddUnsearchableHudIconToList( *p );
 			if ( pWeaponInfo->iconAmmo )
 			{
-				pWeaponInfo->iconAmmo->Precache();
 				pHudHR->SetHistoryGap( pWeaponInfo->iconAmmo->Height() );
 			}
 		}
@@ -203,7 +199,6 @@ void WeaponsResource::LoadWeaponSprites( WEAPON_FILE_INFO_HANDLE hWeaponFileInfo
 			pWeaponInfo->iconAmmo2 = gHUD.AddUnsearchableHudIconToList( *p );
 			if ( pWeaponInfo->iconAmmo2 )
 			{
-				pWeaponInfo->iconAmmo2->Precache();
 				pHudHR->SetHistoryGap( pWeaponInfo->iconAmmo2->Height() );
 			}
 		}

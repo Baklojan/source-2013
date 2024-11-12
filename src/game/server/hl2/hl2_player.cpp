@@ -105,7 +105,7 @@ ConVar sv_infinite_aux_power( "sv_infinite_aux_power", "0", FCVAR_CHEAT );
 
 ConVar autoaim_unlock_target( "autoaim_unlock_target", "0.8666" );
 
-ConVar sv_stickysprint("sv_stickysprint", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX);
+ConVar sv_stickysprint("sv_stickysprint", "0", FCVAR_ARCHIVE );
 
 #define	FLASH_DRAIN_TIME	 1.1111	// 100 units / 90 secs
 #define	FLASH_CHARGE_TIME	 50.0f	// 100 units / 2 secs
@@ -868,15 +868,12 @@ void CHL2_Player::PreThink(void)
 	UpdateWeaponPosture();
 
 	// Disallow shooting while zooming
-	if ( IsX360() )
+	if ( IsZooming() )
 	{
-		if ( IsZooming() )
+		if( GetActiveWeapon() && !GetActiveWeapon()->IsWeaponZoomed() )
 		{
-			if( GetActiveWeapon() && !GetActiveWeapon()->IsWeaponZoomed() )
-			{
-				// If not zoomed because of the weapon itself, do not attack.
-				m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
-			}
+			// If not zoomed because of the weapon itself, do not attack.
+			m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
 		}
 	}
 	else
@@ -2509,56 +2506,53 @@ void CHL2_Player::GetAutoaimVector( autoaim_params_t &params )
 {
 	BaseClass::GetAutoaimVector( params );
 
-	if ( IsX360() )
+	if( IsInAVehicle() )
 	{
-		if( IsInAVehicle() )
+		if( m_hLockedAutoAimEntity && m_hLockedAutoAimEntity->IsAlive() && ShouldKeepLockedAutoaimTarget(m_hLockedAutoAimEntity) )
 		{
-			if( m_hLockedAutoAimEntity && m_hLockedAutoAimEntity->IsAlive() && ShouldKeepLockedAutoaimTarget(m_hLockedAutoAimEntity) )
+			if( params.m_hAutoAimEntity && params.m_hAutoAimEntity != m_hLockedAutoAimEntity )
 			{
-				if( params.m_hAutoAimEntity && params.m_hAutoAimEntity != m_hLockedAutoAimEntity )
-				{
-					// Autoaim has picked a new target. Switch.
-					m_hLockedAutoAimEntity = params.m_hAutoAimEntity;
-				}
-
-				// Ignore autoaim and just keep aiming at this target.
-				params.m_hAutoAimEntity = m_hLockedAutoAimEntity;
-				Vector vecTarget = m_hLockedAutoAimEntity->BodyTarget( EyePosition(), false );
-				Vector vecDir = vecTarget - EyePosition();
-				VectorNormalize( vecDir );
-
-				params.m_vecAutoAimDir = vecDir;
-				params.m_vecAutoAimPoint = vecTarget;
-				return;		
+				// Autoaim has picked a new target. Switch.
+				m_hLockedAutoAimEntity = params.m_hAutoAimEntity;
 			}
-			else
+
+			// Ignore autoaim and just keep aiming at this target.
+			params.m_hAutoAimEntity = m_hLockedAutoAimEntity;
+			Vector vecTarget = m_hLockedAutoAimEntity->BodyTarget( EyePosition(), false );
+			Vector vecDir = vecTarget - EyePosition();
+			VectorNormalize( vecDir );
+
+			params.m_vecAutoAimDir = vecDir;
+			params.m_vecAutoAimPoint = vecTarget;
+			return;		
+		}
+		else
+		{
+			m_hLockedAutoAimEntity = NULL;
+		}
+	}
+
+	// If the player manually gets his crosshair onto a target, make that target sticky
+	if( params.m_fScale != AUTOAIM_SCALE_DIRECT_ONLY )
+	{
+		// Only affect this for 'real' queries
+		//if( params.m_hAutoAimEntity && params.m_bOnTargetNatural )
+		if( params.m_hAutoAimEntity )
+		{
+			// Turn on sticky.
+			m_HL2Local.m_bStickyAutoAim = true;
+
+			if( IsInAVehicle() )
 			{
-				m_hLockedAutoAimEntity = NULL;
+				m_hLockedAutoAimEntity = params.m_hAutoAimEntity;
 			}
 		}
-
-		// If the player manually gets his crosshair onto a target, make that target sticky
-		if( params.m_fScale != AUTOAIM_SCALE_DIRECT_ONLY )
+		else if( !params.m_hAutoAimEntity )
 		{
-			// Only affect this for 'real' queries
-			//if( params.m_hAutoAimEntity && params.m_bOnTargetNatural )
-			if( params.m_hAutoAimEntity )
-			{
-				// Turn on sticky.
-				m_HL2Local.m_bStickyAutoAim = true;
+			// Turn off sticky only if there's no target at all.
+			m_HL2Local.m_bStickyAutoAim = false;
 
-				if( IsInAVehicle() )
-				{
-					m_hLockedAutoAimEntity = params.m_hAutoAimEntity;
-				}
-			}
-			else if( !params.m_hAutoAimEntity )
-			{
-				// Turn off sticky only if there's no target at all.
-				m_HL2Local.m_bStickyAutoAim = false;
-
-				m_hLockedAutoAimEntity = NULL;
-			}
+			m_hLockedAutoAimEntity = NULL;
 		}
 	}
 }

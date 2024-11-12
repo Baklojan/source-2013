@@ -617,20 +617,13 @@ void CTeamplayRoundBasedRules::Think( void )
 		// check to see if we should change levels now
 		if ( m_flIntermissionEndTime && ( m_flIntermissionEndTime < gpGlobals->curtime ) )
 		{
-			if ( !IsX360() )
+			IGameEvent * event = gameeventmanager->CreateEvent( "player_stats_updated" );
+			if ( event )
 			{
-				ChangeLevel(); // intermission is over
+				event->SetBool( "forceupload", true );
+				gameeventmanager->FireEvent( event );
 			}
-			else
-			{
-				IGameEvent * event = gameeventmanager->CreateEvent( "player_stats_updated" );
-				if ( event )
-				{
-					event->SetBool( "forceupload", true );
-					gameeventmanager->FireEvent( event );
-				}
-				engine->MultiplayerEndGame();
-			}
+			engine->MultiplayerEndGame();
 
 			// Don't run this code again
 			m_flIntermissionEndTime = 0.f;

@@ -81,9 +81,7 @@ static Vector WALL_MAX(WALL_OFFSET,WALL_OFFSET,WALL_OFFSET);
 bool CommentaryModeShouldSwallowInput( C_BasePlayer *pPlayer );
 
 extern ConVar default_fov;
-#ifndef _XBOX
 extern ConVar sensitivity;
-#endif
 
 static C_BasePlayer *s_pLocalPlayer = NULL;
 
@@ -521,7 +519,6 @@ bool C_BasePlayer::IsReplay() const
 
 CBaseEntity	*C_BasePlayer::GetObserverTarget() const	// returns players target or NULL
 {
-#ifndef _XBOX
 	if ( IsHLTV() )
 	{
 		return HLTVCamera()->GetPrimaryTarget();
@@ -531,7 +528,6 @@ CBaseEntity	*C_BasePlayer::GetObserverTarget() const	// returns players target o
 	{
 		return ReplayCamera()->GetPrimaryTarget();
 	}
-#endif
 #endif
 	
 	if ( GetObserverMode() == OBS_MODE_ROAMING )
@@ -622,7 +618,6 @@ void C_BasePlayer::SetObserverMode ( int iNewMode )
 
 int C_BasePlayer::GetObserverMode() const 
 { 
-#ifndef _XBOX
 	if ( IsHLTV() )
 	{
 		return HLTVCamera()->GetMode();
@@ -632,7 +627,6 @@ int C_BasePlayer::GetObserverMode() const
 	{
 		return ReplayCamera()->GetMode();
 	}
-#endif
 #endif
 
 	if ( IsLocalPlayer() && UseVR() )
@@ -1165,9 +1159,7 @@ bool C_BasePlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 	}
 	else 
 	{
-#ifndef _X360
 		if ( joy_autosprint.GetBool() )
-#endif
 		{
 			if ( input->KeyState( &in_joyspeed ) != 0.0f )
 			{
@@ -1396,11 +1388,11 @@ bool C_BasePlayer::ShouldInterpolate()
 	// always interpolate myself
 	if ( IsLocalPlayer() )
 		return true;
-#ifndef _XBOX
+
 	// always interpolate entity if followed by HLTV
 	if ( HLTVCamera()->GetCameraMan() == this )
 		return true;
-#endif
+
 	return BaseClass::ShouldInterpolate();
 }
 
@@ -2214,7 +2206,6 @@ Vector C_BasePlayer::GetAutoaimVector( float flScale )
 
 void C_BasePlayer::PlayPlayerJingle()
 {
-#ifndef _XBOX
 	// Find player sound for shooter
 	player_info_t info;
 	engine->GetPlayerInfo( entindex(), &info );
@@ -2259,7 +2250,6 @@ void C_BasePlayer::PlayPlayerJingle()
 	ep.m_SoundLevel = SNDLVL_NORM;
 
 	C_BaseEntity::EmitSound( filter, GetSoundSourceIndex(), ep );
-#endif
 }
 
 // Stuff for prediction

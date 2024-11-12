@@ -410,7 +410,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #define MESSAGE(msg) message(__FILE__ "(" V_STRINGIFY(__LINE__) "): " msg)
 
 
-#if !defined( _X360 ) || !defined( _RETAIL )
+#if !defined( _RETAIL )
 
 /* These are always compiled in */
 DBG_INTERFACE void Msg( PRINTF_FORMAT_STRING const tchar* pMsg, ... ) FMTFUNCTION( 1, 2 );
@@ -464,7 +464,7 @@ inline void ErrorV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist ) {}
 		Error msg;			\
 	}
 
-#if !defined( _X360 ) || !defined( _RETAIL )
+#if !defined( _RETAIL )
 
 /* A couple of super-common dynamic spew messages, here for convenience */
 /* These looked at the "developer" group */
@@ -687,7 +687,7 @@ private:
 //
 // Purpose: Embed debug info in each file.
 //
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 
 	#ifdef _DEBUG
 		#pragma comment(compiler)

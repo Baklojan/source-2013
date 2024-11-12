@@ -105,9 +105,7 @@
 #endif
 #include "vgui/ILocalize.h"
 #include "vgui/IVGui.h"
-#include "ixboxsystem.h"
 #include "ipresence.h"
-#include "engine/imatchmaking.h"
 #include "cdll_bounded_cvars.h"
 #include "matsys_controls/matsyscontrols.h"
 #include "gamestats.h"
@@ -201,8 +199,6 @@ IGameEventManager2 *gameeventmanager = NULL;
 ISoundEmitterSystemBase *soundemitterbase = NULL;
 IInputSystem *inputsystem = NULL;
 ISceneFileCache *scenefilecache = NULL;
-IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
-IMatchmaking *matchmaking = NULL;
 IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
 #if defined( REPLAY_ENABLED )
@@ -696,7 +692,7 @@ public:
 	virtual bool			GetPlayerView( CViewSetup &playerView );
 
 	// Matchmaking
-	virtual void			SetupGameProperties( CUtlVector< XUSER_CONTEXT > &contexts, CUtlVector< XUSER_PROPERTY > &properties );
+	virtual void			SetupGameProperties();
 	virtual uint			GetPresenceID( const char *pIDName );
 	virtual const char		*GetPropertyIdString( const uint id );
 	virtual void			GetPropertyDisplayString( uint id, uint value, char *pOutput, int nBytes );
@@ -924,14 +920,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
-	if ( IsX360() && (xboxsystem = (IXboxSystem *)appSystemFactory( XBOXSYSTEM_INTERFACE_VERSION, NULL )) == NULL )
-		return false;
-	if ( IsX360() && (matchmaking = (IMatchmaking *)appSystemFactory( VENGINE_MATCHMAKING_VERSION, NULL )) == NULL )
-		return false;
-#ifndef _XBOX
 	if ( ( gamestatsuploader = (IUploadGameStats *)appSystemFactory( INTERFACEVERSION_UPLOADGAMESTATS, NULL )) == NULL )
 		return false;
-#endif
 
 #if defined( REPLAY_ENABLED )
 	if ( IsPC() && (g_pEngineReplay = (IEngineReplay *)appSystemFactory( ENGINE_REPLAY_INTERFACE_VERSION, NULL )) == NULL )
@@ -1081,13 +1071,11 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	C_BaseAnimating::InitBoneSetupThreadPool();
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	// NVNT connect haptics sytem
 	ConnectHaptics(appSystemFactory);
 #endif
-#ifndef _X360
 	HookHapticMessages(); // Always hook the messages
-#endif
 
 	return true;
 }
@@ -1515,9 +1503,9 @@ bool CHLClient::GetPlayerView( CViewSetup &playerView )
 //-----------------------------------------------------------------------------
 // Matchmaking
 //-----------------------------------------------------------------------------
-void CHLClient::SetupGameProperties( CUtlVector< XUSER_CONTEXT > &contexts, CUtlVector< XUSER_PROPERTY > &properties )
+void CHLClient::SetupGameProperties()
 {
-	presence->SetupGameProperties( contexts, properties );
+	presence->SetupGameProperties();
 }
 
 uint CHLClient::GetPresenceID( const char *pIDName )
@@ -1727,10 +1715,6 @@ void CHLClient::LevelShutdown( void )
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
 #endif
 	UncacheAllMaterials();
-
-#ifdef _XBOX
-	ReleaseRenderTargets();
-#endif
 
 	// string tables are cleared on disconnect from a server, so reset our global pointers to NULL
 	ResetStringTablePointers();

@@ -487,7 +487,6 @@ void IN_Grenade1Up( const CCommand &args ) { KeyUp( &in_grenade1, args[1] ); }
 void IN_Grenade1Down( const CCommand &args ) { KeyDown( &in_grenade1, args[1] ); }
 void IN_Grenade2Up( const CCommand &args ) { KeyUp( &in_grenade2, args[1] ); }
 void IN_Grenade2Down( const CCommand &args ) { KeyDown( &in_grenade2, args[1] ); }
-void IN_XboxStub( const CCommand &args ) { /*do nothing*/ }
 void IN_Attack3Down( const CCommand &args ) { KeyDown(&in_attack3, args[1] );}
 void IN_Attack3Up( const CCommand &args ) { KeyUp(&in_attack3, args[1] );}
 
@@ -937,12 +936,9 @@ ControllerMove
 */
 void CInput::ControllerMove( float frametime, CUserCmd *cmd )
 {
-	if ( IsPC() )
+	if ( !m_fCameraInterceptingMouse && m_fMouseActive )
 	{
-		if ( !m_fCameraInterceptingMouse && m_fMouseActive )
-		{
-			MouseMove( cmd);
-		}
+		MouseMove( cmd);
 	}
 
 	JoyStickMove( frametime, cmd);
@@ -967,7 +963,7 @@ void CInput::ControllerMove( float frametime, CUserCmd *cmd )
 		haptics->CalculateMove(cmd->forwardmove, cmd->sidemove, frametime);
 		// NVNT send a game process to the haptics system.
 		haptics->GameProcess();
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 		// NVNT update our avatar effect.
 		UpdateAvatarEffect();
 #endif
@@ -1631,10 +1627,6 @@ static ConCommand endattack3("-attack3", IN_Attack3Up);
 static ConCommand toggle_duck( "toggle_duck", IN_DuckToggle );
 #endif
 
-// Xbox 360 stub commands
-static ConCommand xboxmove("xmove", IN_XboxStub);
-static ConCommand xboxlook("xlook", IN_XboxStub);
-
 /*
 ============
 Init_All
@@ -1663,11 +1655,8 @@ void CInput::Init_All (void)
 	m_flLastForwardMove = 0.0;
 
 	// Initialize inputs
-	if ( IsPC() )
-	{
-		Init_Mouse ();
-		Init_Keyboard();
-	}
+	Init_Mouse ();
+	Init_Keyboard();
 		
 	// Initialize third person camera controls.
 	Init_Camera();
