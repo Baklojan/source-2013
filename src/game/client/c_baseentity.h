@@ -1079,14 +1079,6 @@ public:
 	virtual const Vector &GetViewOffset() const;
 	virtual void		  SetViewOffset( const Vector& v );
 
-#ifdef SIXENSE
-	const Vector&		GetEyeOffset() const;
-	void				SetEyeOffset( const Vector& v );
-
-	const QAngle &		GetEyeAngleOffset() const;
-	void				SetEyeAngleOffset( const QAngle & qa );
-#endif
-
 	// Invalidates the abs state of all children
 	void InvalidatePhysicsRecursive( int nChangeFlags );
 
