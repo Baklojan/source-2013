@@ -4574,7 +4574,6 @@ bool RepackBSP( CUtlBuffer &inputBuffer_, CUtlBuffer &outputBuffer, CompressFunc
 	}
 
 	CByteswap	byteSwap;
-	if ( IsX360() )
 
 	unsigned int headerOffset = outputBuffer.TellPut();
 	outputBuffer.Put( pInBSPHeader, sizeof( dheader_t ) );
