@@ -31,7 +31,6 @@
 
 DEFINE_FALLBACK_SHADER( Teeth, Teeth_DX9 )
 
-extern ConVar r_flashlight_version2;
 BEGIN_VS_SHADER( Teeth_DX9, "Help for Teeth_DX9" )
 
 	BEGIN_SHADER_PARAMS
@@ -562,7 +561,7 @@ BEGIN_VS_SHADER( Teeth_DX9, "Help for Teeth_DX9" )
 			SET_FLAGS2( MATERIAL_VAR2_LIGHTING_VERTEX_LIT );
 		}
 		bool hasFlashlight = UsingFlashlight( params );
-		if ( !hasFlashlight || ( IsX360() || r_flashlight_version2.GetInt() ) )
+		if ( !hasFlashlight )
 		{
 			DrawUsingVertexShader( params, pShaderAPI, pShaderShadow, vertexCompression );
 			SHADOW_STATE
@@ -570,7 +569,7 @@ BEGIN_VS_SHADER( Teeth_DX9, "Help for Teeth_DX9" )
 				SetInitialShadowState();
 			}
 		}
-		if( hasFlashlight )
+		else
 		{
 			DrawFlashlight( params, pShaderAPI, pShaderShadow, vertexCompression );
 		}

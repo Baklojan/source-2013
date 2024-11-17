@@ -91,10 +91,9 @@
 static ConVar r_flashlightdrawfrustum( "r_flashlightdrawfrustum", "0" );
 static ConVar r_flashlightmodels( "r_flashlightmodels", "1" );
 static ConVar r_shadowrendertotexture( "r_shadowrendertotexture", "0" );
-static ConVar r_flashlight_version2( "r_flashlight_version2", "0" );
 
-
-void WorldLightCastShadowCallback( IConVar* pVar, const char* pszOldValue, float flOldValue );
+//Dynamic RTT shadow angles
+void WorldLightCastShadowCallback( IConVar *pVar, const char* pszOldValue, float flOldValue );
 static ConVar r_worldlight_castshadows( "r_worldlight_castshadows", "1", FCVAR_CHEAT, "Allow world lights to cast shadows", true, 0, true, 1, WorldLightCastShadowCallback );
 static ConVar r_worldlight_lerptime( "r_worldlight_lerptime", "0.5", FCVAR_CHEAT );
 static ConVar r_worldlight_debug( "r_worldlight_debug", "0", FCVAR_CHEAT );
@@ -2621,15 +2620,7 @@ static void BuildFlashlightLeafList( CShadowLeafEnum *pEnum, const VMatrix &worl
 
 void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 {
-	// For the 360, we just draw flashlights with the main geometry
-	// and bypass the entire shadow casting system.
 	ClientShadow_t &shadow = m_Shadows[handle];
-	if ( r_flashlight_version2.GetInt() )
-	{
-		// This will update the matrices, but not do work to add the flashlight to surfaces
-		shadowmgr->ProjectFlashlight( shadow.m_ShadowHandle, shadow.m_WorldToShadow, 0, NULL );
-		return;
-	}
 
 	VPROF_BUDGET( "CClientShadowMgr::BuildFlashlight", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
@@ -3894,12 +3885,6 @@ int CClientShadowMgr::BuildActiveShadowDepthList( const CViewSetup &viewSetup, i
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, ClientShadowHandle_t* pActiveFlashlights )
 {
-	// NOTE: On the 360, we render the entire scene with the flashlight state
-	// set and don't render flashlights additively in the shadow mgr at a far later time
-	// because the CPU costs are prohibitive
-	if ( !r_flashlight_version2.GetInt() )
-		return;
-
 	Assert( nActiveFlashlightCount<= 1 ); 
 	if ( nActiveFlashlightCount > 0 )
 	{
