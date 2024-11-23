@@ -1,2 +1,2 @@
-devtools\bin\vpc.exe /hl2mp +game /mksln games.sln /define:VS2022
+devtools\bin\vpc.exe /hl2mp +game +shaders /mksln games.sln /define:VS2022
 pause

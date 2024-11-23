@@ -724,7 +724,7 @@ float VertexAttenInternal( const float3 worldPos, int lightNum )
 	lightDir *= ooLightDist;
 
 	float3 vDist;
-#	vDist = dst( lightDistSquared, ooLightDist );
+	vDist = dst( lightDistSquared, ooLightDist );
 
 	float flDistanceAtten = 1.0f / dot( cLightInfo[lightNum].atten.xyz, vDist );
 

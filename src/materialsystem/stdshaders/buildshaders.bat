@@ -15,9 +15,9 @@ set tt_start=%ERRORLEVEL%
 set tt_chkpt=%tt_start%
 
 
-REM ****************
-REM usage: buildshaders <shaderProjectName>
-REM ****************
+@REM ****************
+@REM usage: buildshaders <shaderProjectName>
+@REM ****************
 
 setlocal
 set arg_filename=%1
@@ -53,9 +53,9 @@ goto set_force_end
 if /i "%2" == "-game" goto set_mod_args
 goto build_shaders
 
-REM ****************
-REM USAGE
-REM ****************
+@REM ****************
+@REM USAGE
+@REM ****************
 :usage
 echo.
 echo "usage: buildshaders <shaderProjectName> [-game] [gameDir if -game was specified] [-source sourceDir]"
@@ -65,27 +65,27 @@ echo "ex   : buildshaders myshaders"
 echo "ex   : buildshaders myshaders -game c:\steam\steamapps\sourcemods\mymod -source c:\mymod\src"
 goto :end
 
-REM ****************
-REM MOD ARGS - look for -game or the vproject environment variable
-REM ****************
+@REM ****************
+@REM MOD ARGS - look for -game or the vproject environment variable
+@REM ****************
 :set_mod_args
 
 if not exist "%SDKBINDIR%\shadercompile.exe" goto NoShaderCompile
-set ChangeToDir=%SDKBINDIR%
+set ChangeToDir="%SDKBINDIR%"
 
 if /i "%4" NEQ "-source" goto NoSourceDirSpecified
 set SrcDirBase=%~5
 
-REM ** use the -game parameter to tell us where to put the files
+@REM ** use the -game parameter to tell us where to put the files
 set targetdir=%~3\shaders
 set SDKArgs=-nompi -nop4 -game "%~3"
 
 if not exist "%~3\gameinfo.txt" goto InvalidGameDirectory
 goto build_shaders
 
-REM ****************
-REM ERRORS
-REM ****************
+@REM ****************
+@REM ERRORS
+@REM ****************
 :InvalidGameDirectory
 echo -
 echo Error: "%~3" is not a valid game directory.
@@ -104,53 +104,53 @@ echo - ERROR: shadercompile.exe doesn't exist in %SDKBINDIR%
 echo -
 goto end
 
-REM ****************
-REM BUILD SHADERS
-REM ****************
+@REM ****************
+@REM BUILD SHADERS
+@REM ****************
 :build_shaders
 
-rem echo --------------------------------
-rem echo %inputbase%
-rem echo --------------------------------
-REM make sure that target dirs exist
-REM files will be built in these targets and copied to their final destination
+@REM echo --------------------------------
+@REM echo %inputbase%
+@REM echo --------------------------------
+@REM make sure that target dirs exist
+@REM files will be built in these targets and copied to their final destination
 if not exist %shaderDir% mkdir %shaderDir%
 if not exist %shaderDir%\fxc mkdir %shaderDir%\fxc
 if not exist %shaderDir%\vsh mkdir %shaderDir%\vsh
 if not exist %shaderDir%\psh mkdir %shaderDir%\psh
-REM Nuke some files that we will add to later.
+@REM Nuke some files that we will add to later.
 if exist filelist.txt del /f /q filelist.txt
 if exist filestocopy.txt del /f /q filestocopy.txt
 if exist filelistgen.txt del /f /q filelistgen.txt
 if exist inclist.txt del /f /q inclist.txt
 if exist vcslist.txt del /f /q vcslist.txt
 
-REM ****************
-REM Generate a makefile for the shader project
-REM ****************
+@REM ****************
+@REM Generate a makefile for the shader project
+@REM ****************
 perl "%SrcDirBase%\devtools\bin\updateshaders.pl" -source "%SrcDirBase%" %inputbase%
 
 
-REM ****************
-REM Run the makefile, generating minimal work/build list for fxc files, go ahead and compile vsh and psh files.
-REM ****************
-rem nmake /S /C -f makefile.%inputbase% clean > clean.txt 2>&1
+@REM ****************
+@REM Run the makefile, generating minimal work/build list for fxc files, go ahead and compile vsh and psh files.
+@REM ****************
+@REM nmake /S /C -f makefile.%inputbase% clean > clean.txt 2>&1
 echo Building inc files, asm vcs files, and VMPI worklist for %inputbase%...
 nmake /S /C -f makefile.%inputbase%
 
-REM ****************
-REM Copy the inc files to their target
-REM ****************
+@REM ****************
+@REM Copy the inc files to their target
+@REM ****************
 if exist "inclist.txt" (
 	echo Publishing shader inc files to target...
 	perl %SrcDirBase%\devtools\bin\copyshaderincfiles.pl inclist.txt
 )
 
-REM ****************
-REM Add the executables to the worklist.
-REM ****************
+@REM ****************
+@REM Add the executables to the worklist.
+@REM ****************
 if /i "%DIRECTX_SDK_VER%" == "pc09.00" (
-	rem echo "Copy extra files for dx 9 std
+	@REM echo "Copy extra files for dx 9 std
 )
 if /i "%DIRECTX_SDK_VER%" == "pc09.30" (
 	echo %SrcDirBase%\devtools\bin\d3dx9_33.dll >> filestocopy.txt
@@ -163,18 +163,18 @@ echo %SDKBINDIR%\shadercompile_dll.dll >> filestocopy.txt
 echo %SDKBINDIR%\vstdlib.dll >> filestocopy.txt
 echo %SDKBINDIR%\tier0.dll >> filestocopy.txt
 
-REM ****************
-REM Cull duplicate entries in work/build list
-REM ****************
+@REM ****************
+@REM Cull duplicate entries in work/build list
+@REM ****************
 if exist filestocopy.txt type filestocopy.txt | perl "%SrcDirBase%\devtools\bin\uniqifylist.pl" > uniquefilestocopy.txt
 if exist filelistgen.txt if not "%dynamic_shaders%" == "1" (
     echo Generating action list...
     copy filelistgen.txt filelist.txt >nul
 )
 
-REM ****************
-REM Execute distributed process on work/build list
-REM ****************
+@REM ****************
+@REM Execute distributed process on work/build list
+@REM ****************
 
 set shader_path_cd=%cd%
 if exist "filelist.txt" if exist "uniquefilestocopy.txt" if not "%dynamic_shaders%" == "1" (
@@ -186,11 +186,11 @@ if exist "filelist.txt" if exist "uniquefilestocopy.txt" if not "%dynamic_shader
 	cd /D %shader_path_cd%
 )
 
-REM ****************
-REM PC Shader copy
-REM Publish the generated files to the output dir using XCOPY
-REM This batch file may have been invoked standalone or slaved (master does final smart mirror copy)
-REM ****************
+@REM ****************
+@REM PC Shader copy
+@REM Publish the generated files to the output dir using XCOPY
+@REM This batch file may have been invoked standalone or slaved (master does final smart mirror copy)
+@REM ****************
 :DoXCopy
 if not "%dynamic_shaders%" == "1" (
 if not exist "%targetdir%" md "%targetdir%"
@@ -198,9 +198,9 @@ if not "%targetdir%"=="%shaderDir%" xcopy %shaderDir%\*.* "%targetdir%" /e /y
 )
 goto end
 
-REM ****************
-REM END
-REM ****************
+@REM ****************
+@REM END
+@REM ****************
 :end
 
 
