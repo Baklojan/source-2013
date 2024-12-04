@@ -835,11 +835,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 						// If the inflictor is the killer,  then it must be their current weapon doing the damage
 						if ( pScorer->GetActiveWeapon() )
 						{
-#ifdef HL1MP_DLL
-							killer_weapon_name = pScorer->GetActiveWeapon()->GetClassname();
-#else
 							killer_weapon_name = pScorer->GetActiveWeapon()->GetDeathNoticeName();
-#endif
 						}
 					}
 					else
@@ -875,9 +871,6 @@ ConVarRef suitcharger( "sk_suitcharger" );
 			event->SetInt("attacker", killer_ID );
 			event->SetInt("customkill", info.GetDamageCustom() );
 			event->SetInt("priority", 7 );	// HLTV event priority, not transmitted
-#ifdef HL1MP_DLL
-			event->SetString("weapon", killer_weapon_name );
-#endif			
 			gameeventmanager->FireEvent( event );
 		}
 

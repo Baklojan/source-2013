@@ -37,10 +37,6 @@
 	
 #endif
 
-#if defined( CSTRIKE_DLL )
-#include "weapon_c4.h"
-#endif // CSTRIKE_DLL
-
 #include "in_buttons.h"
 #include "engine/IEngineSound.h"
 #include "tier0/vprof.h"
@@ -577,11 +573,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 
 		SetStepSoundTime( STEPSOUNDTIME_ON_LADDER, bWalking );
 	}
-#ifdef CSTRIKE_DLL
-	else if ( enginetrace->GetPointContents( knee ) & MASK_WATER )  // we want to use the knee for Cstrike, not the waist
-#else
 	else if ( GetWaterLevel() == WL_Waist )
-#endif // CSTRIKE_DLL
 	{
 		static int iSkipStep = 0;
 

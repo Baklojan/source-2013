@@ -55,13 +55,12 @@ CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectMuzzleFlash )
 	CLIENTEFFECT_MATERIAL( "effects/muzzleflash2_noz" )
 	CLIENTEFFECT_MATERIAL( "effects/muzzleflash3_noz" )
 	CLIENTEFFECT_MATERIAL( "effects/muzzleflash4_noz" )
-#ifndef CSTRIKE_DLL
 	CLIENTEFFECT_MATERIAL( "effects/combinemuzzle1" )
 	CLIENTEFFECT_MATERIAL( "effects/combinemuzzle2" )
 	CLIENTEFFECT_MATERIAL( "effects/combinemuzzle1_noz" )
 	CLIENTEFFECT_MATERIAL( "effects/combinemuzzle2_noz" )
 	CLIENTEFFECT_MATERIAL( "effects/strider_muzzle" )
-#endif
+
 CLIENTEFFECT_REGISTER_END()
 #endif
 
@@ -94,15 +93,6 @@ C_LocalTempEntity::C_LocalTempEntity()
 	m_pfnDrawHelper = 0;
 	m_pszImpactEffect = NULL;
 }
-
-
-#if defined( CSTRIKE_DLL ) || defined (SDK_DLL )
-
-#define TE_RIFLE_SHELL 1024
-#define TE_PISTOL_SHELL 2048
-#define TE_SHOTGUN_SHELL 4096
-
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Prepare a temp entity for creation
@@ -1803,12 +1793,6 @@ void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachm
 //-----------------------------------------------------------------------------
 void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type, ClientEntityHandle_t hEntity, bool firstPerson )
 {
-#ifdef CSTRIKE_DLL
-
-	return;
-
-#else
-
 	//NOTENOTE: This function is becoming obsolete as the muzzles are moved over to being local to attachments
 
 	switch ( type )
@@ -1871,9 +1855,6 @@ void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type,
 		Assert(0);
 		break;
 	}
-
-#endif
-
 }
 
 //-----------------------------------------------------------------------------
