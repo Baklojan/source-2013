@@ -67,6 +67,9 @@ CLIENTEFFECT_REGISTER_END()
 //Whether or not to eject brass from weapons
 ConVar cl_ejectbrass( "cl_ejectbrass", "1" );
 
+//Brass lifetime
+ConVar cl_brasslife( "cl_brasslife", "5" );
+
 ConVar func_break_max_pieces( "func_break_max_pieces", "15", FCVAR_ARCHIVE | FCVAR_REPLICATED );
 
 ConVar cl_fasttempentcollision( "cl_fasttempentcollision", "5" );
@@ -1678,7 +1681,7 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 						dir[1] + random->RandomFloat(-64,64),
 						dir[2] + random->RandomFloat(  0,64) ) );
 
-	pTemp->die = gpGlobals->curtime + 1.0f + random->RandomFloat( 0.0f, 1.0f );	// Add an extra 0-1 secs of life	
+	pTemp->die = gpGlobals->curtime + cl_brasslife.GetFloat() + random->RandomFloat( 0.0f, 1.0f );	// Set brass life time, add an extra 0-1 secs of life
 }
 
 //-----------------------------------------------------------------------------
