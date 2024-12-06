@@ -4,8 +4,8 @@
 //
 //===========================================================================//
 
-#ifndef COMBATWEAPON_SHARED_H
-#define COMBATWEAPON_SHARED_H
+#ifndef BASECOMBATWEAPON_SHARED_H
+#define BASECOMBATWEAPON_SHARED_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -650,4 +650,4 @@ protected:
 #endif // End Client .dll only
 };
 
-#endif // COMBATWEAPON_SHARED_H
+#endif // BASECOMBATWEAPON_SHARED_H

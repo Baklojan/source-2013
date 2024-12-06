@@ -18,7 +18,7 @@
 
 
 #ifdef HL2MP
-#include "hl2mp/weapon_crowbar.h"
+#include "mod/weapon_crowbar.h"
 #else
 #include "weapon_crowbar.h"
 #endif

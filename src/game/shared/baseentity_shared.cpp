@@ -31,7 +31,7 @@
 	#include "func_break.h"
 
 #ifdef HL2MP
-	#include "te_hl2mp_shotgun_shot.h"
+	#include "te_mod_shotgun_shot.h"
 #endif
 
 	#include "gamestats.h"
