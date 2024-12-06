@@ -487,6 +487,14 @@ void C_BaseViewModel::AddEntity( void )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool C_BaseViewModel::ShouldReceiveProjectedTextures( int flags )
+{
+	return ( flags & SHADOW_FLAGS_PLAYER_FLASHLIGHT ) == 0;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void C_BaseViewModel::GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS])
