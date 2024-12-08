@@ -37,6 +37,9 @@ public:
 
 	virtual void	Init();
 	virtual int		GetDeathMessageStartHeight( void );
+
+	// Stub
+	void ComputeVguiResConditions( KeyValues *pkvConditions) override {}
 };
 
 extern IClientMode *GetClientModeNormal();

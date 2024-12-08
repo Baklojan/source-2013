@@ -68,7 +68,7 @@ bool IsInFreezeCam( void );
 //-----------------------------------------------------------------------------
 // Purpose: Base Player class
 //-----------------------------------------------------------------------------
-class C_BasePlayer : public C_BaseCombatCharacter, public CGameEventListener
+class C_BasePlayer : public C_BaseCombatCharacter
 {
 public:
 	DECLARE_CLASS( C_BasePlayer, C_BaseCombatCharacter );
@@ -468,8 +468,6 @@ protected:
 
 	// used by client side player footsteps 
 	surfacedata_t* GetGroundSurface();
-
-	virtual void	FireGameEvent( IGameEvent *event );
 
 protected:
 	// Did we just enter a vehicle this frame?

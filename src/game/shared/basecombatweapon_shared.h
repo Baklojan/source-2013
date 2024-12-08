@@ -410,7 +410,6 @@ public:
 
 	virtual void			Activate( void );
 
-	virtual bool ShouldUseLargeViewModelVROverride() { return false; }
 public:
 // Server Only Methods
 #if !defined( CLIENT_DLL )

@@ -10,7 +10,6 @@
 #define ICLIENTMODE_H
 
 #include <vgui/VGUI.h>
-#include "client_virtualreality.h"
 
 class CViewSetup;
 class C_BaseEntity;
@@ -121,7 +120,7 @@ public:
 	 
 	virtual wchar_t* GetServerName() = 0;
 	virtual void SetServerName(wchar_t* name) = 0;
-	virtual wchar_t* GetMapName() = 0;
+	virtual wchar_t* GetMapName() = 0;	
 	virtual void SetMapName(wchar_t* name) = 0;
 	 
 	//=============================================================================
@@ -138,12 +137,6 @@ public:
 
 	// Called every frame.
 	virtual void	Update()=0;	
-
-	// Returns true if VR mode should black out everything around the UI
-	virtual bool	ShouldBlackoutAroundHUD() = 0;
-
-	// Returns true if VR mode should black out everything around the UI
-	virtual HeadtrackMovementMode_t ShouldOverrideHeadtrackControl() = 0;
 
 	virtual bool	IsInfoPanelAllowed() = 0;
 	virtual void	InfoPanelDisplayed() = 0;

@@ -318,7 +318,7 @@ public:
 	void			AddViewToScene( CRendering3dView *pView ) { m_SimpleExecutor.AddView( pView ); }
 protected:
 	// Sets up the view parameters for all views (left, middle and right eyes).
-    void            SetUpViews();
+	void            SetUpViews();
 
 	// Sets up the view parameters of map overview mode (cl_leveloverview)
 	void			SetUpOverView();
@@ -333,17 +333,8 @@ protected:
 	virtual void	WriteReplayScreenshot( WriteReplayScreenshotParams_t &params );
 	virtual void	UpdateReplayScreenshotCache();
 
-    StereoEye_t		GetFirstEye() const;
-    StereoEye_t		GetLastEye() const;
-    CViewSetup &    GetView(StereoEye_t eEye);
-    const CViewSetup &    GetView(StereoEye_t eEye) const ;
-
-
 	// This stores all of the view setup parameters that the engine needs to know about.
-    // Best way to pick the right one is with ::GetView(), rather than directly.
-	CViewSetup		m_View;         // mono <- in stereo mode, this will be between the two eyes and is the "main" view.
-	CViewSetup		m_ViewLeft;     // left (unused for mono)
-	CViewSetup		m_ViewRight;    // right (unused for mono)
+	CViewSetup		m_View;
 
 	// Pitch drifting data
 	CPitchDrift		m_PitchDrift;
@@ -472,7 +463,7 @@ private:
 
 
 	// This stores the current view
- 	CViewSetup		m_CurrentView;
+	CViewSetup		m_CurrentView;
 
 	// VIS Overrides
 	// Set to true to turn off client side vis ( !!!! rendering will be slow since everything will draw )
@@ -517,7 +508,7 @@ private:
 	CBase3dView *m_pActiveRenderer;
 	CSimpleRenderExecutor m_SimpleExecutor;
 
-	bool			m_rbTakeFreezeFrame[ STEREO_EYE_MAX ];
+	bool			m_rbTakeFreezeFrame;
 	float			m_flFreezeFrameUntil;
 
 #if defined( REPLAY_ENABLED )
