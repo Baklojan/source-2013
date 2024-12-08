@@ -14,7 +14,6 @@
 #include "c_playerresource.h"
 #include "c_mod_player.h"
 #include "mod_gamerules.h"
-#include "ihudlcd.h"
 
 
 
