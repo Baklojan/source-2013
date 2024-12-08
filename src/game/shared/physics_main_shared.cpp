@@ -1365,10 +1365,6 @@ int CBaseEntity::PhysicsClipVelocity( const Vector& in, const Vector& normal, Ve
 //-----------------------------------------------------------------------------
 void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity, float flMinTotalElasticity )
 {
-#ifdef HL1_DLL
-	flMinTotalElasticity = 0.3f;
-#endif//HL1_DLL
-
 	// Get the impact surface's elasticity.
 	float flSurfaceElasticity;
 	physprops->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, NULL, &flSurfaceElasticity );

@@ -89,11 +89,6 @@ enum {
 	WINREASON_TIMELIMIT,
 	WINREASON_WINLIMIT,
 	WINREASON_WINDIFFLIMIT,
-#if defined(TF_CLIENT_DLL) || defined(TF_DLL)
-	WINREASON_RD_REACTOR_CAPTURED,
-	WINREASON_RD_CORES_COLLECTED,
-	WINREASON_RD_REACTOR_RETURNED,
-#endif
 };
 
 enum stalemate_reasons_t
@@ -105,24 +100,6 @@ enum stalemate_reasons_t
 	NUM_STALEMATE_REASONS,
 };
 
-
-#if defined(TF_CLIENT_DLL) || defined(TF_DLL)
-
-/// Info about a player in a PVE game or any other mode that we
-/// might eventually decide to use the lobby system for.
-struct LobbyPlayerInfo_t
-{
-	int m_nEntNum; //< Index of player (1...MAX_PLAYERS), or 0 if the guy is in the lobby but not yet known to us
-	CUtlString m_sPlayerName; //< Player display name
-	CSteamID m_steamID; //< Steam ID of the player
-	int m_iTeam; //< Team selection.
-	bool m_bInLobby; //< Is this guy in the lobby?
-	bool m_bConnected; //< Is this a bot?
-	bool m_bBot; //< Is this a bot?
-	bool m_bSquadSurplus; //< Did he present a voucher to get surplus for his squad
-};
-
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Per-state data
@@ -250,18 +227,6 @@ public:
 	bool HasMultipleTrains( void ){ return m_bMultipleTrains; }
 
 	virtual int		GetBonusRoundTime( bool bFinal = false );
-
-#if defined(TF_CLIENT_DLL) || defined(TF_DLL)
-
-	// Get list of all the players, including those in the lobby but who have
-	// not yet joined.
-	void GetAllPlayersLobbyInfo( CUtlVector<LobbyPlayerInfo_t> &vecPlayers, bool bIncludeBots = false );
-
-	// Get list of players who are on the defending team now, or are likely
-	// to end up on the defending team (not yet connected or assigned a team)
-	void GetPotentialPlayersLobbyPlayerInfo( CUtlVector<LobbyPlayerInfo_t> &vecLobbyPlayers, bool bIncludeBots = false );
-
-#endif
 
 	void SetAllowBetweenRounds( bool bValue ) { m_bAllowBetweenRounds = bValue; }
 
@@ -406,10 +371,6 @@ protected:
 	bool		 CheckMaxRounds( bool bAllowEnd = true );
 
 	void		 CheckReadyRestart( void );
-#if defined(TF_CLIENT_DLL) || defined(TF_DLL)
-	bool		 AreLobbyPlayersOnTeamReady( int iTeam );
-	bool		 AreLobbyPlayersConnected( void );
-#endif
 
 	virtual bool CanChangelevelBecauseOfTimeLimit( void ) { return true; }
 	virtual bool CanGoToStalemate( void ) { return true; }

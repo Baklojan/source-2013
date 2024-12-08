@@ -9,9 +9,6 @@
 #include "movevars_shared.h"
 #include "util_shared.h"
 #include "datacache/imdlcache.h"
-#if defined ( TF_DLL ) || defined ( TF_CLIENT_DLL )
-#include "tf_gamerules.h"
-#endif
 
 #if defined( CLIENT_DLL )
 
@@ -716,18 +713,7 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 	EmitSound_t ep;
 	ep.m_nChannel = CHAN_BODY;
 	ep.m_pSoundName = params.soundname;
-#if defined ( TF_DLL ) || defined ( TF_CLIENT_DLL )
-	if( TFGameRules()->IsMannVsMachineMode() )
-	{
-		ep.m_flVolume = params.volume;
-	}
-	else
-	{
-		ep.m_flVolume = fvol;
-	}
-#else
 	ep.m_flVolume = fvol;
-#endif
 	ep.m_SoundLevel = params.soundlevel;
 	ep.m_nFlags = 0;
 	ep.m_nPitch = params.pitch;
@@ -1071,9 +1057,6 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 	useableContents = MASK_NPCSOLID_BRUSHONLY | MASK_OPAQUE_AND_NPCS;
 #endif
 
-#ifdef HL1_DLL
-	useableContents = MASK_SOLID;
-#endif
 #ifndef CLIENT_DLL
 	CBaseEntity *pFoundByTrace = NULL;
 #endif

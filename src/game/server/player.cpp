@@ -2477,7 +2477,6 @@ void CBasePlayer::ValidateCurrentObserverTarget( void )
 		}
 		else
 		{
-#if !defined( TF_DLL )
 			// couldn't find new target, switch to temporary mode
 			if ( mp_forcecamera.GetInt() == OBS_ALLOW_ALL )
 			{
@@ -2485,7 +2484,6 @@ void CBasePlayer::ValidateCurrentObserverTarget( void )
 				ForceObserverMode( OBS_MODE_ROAMING );
 			}
 			else
-#endif
 			{
 				// fix player view right where it is
 				ForceObserverMode( OBS_MODE_FIXED );
@@ -5037,7 +5035,6 @@ void CBasePlayer::Spawn( void )
 	m_vecSmoothedVelocity = vec3_origin;
 	InitVCollision( GetAbsOrigin(), GetAbsVelocity() );
 
-#if !defined( TF_DLL )
 	IGameEvent *event = gameeventmanager->CreateEvent( "player_spawn" );
 	
 	if ( event )
@@ -5045,7 +5042,6 @@ void CBasePlayer::Spawn( void )
 		event->SetInt("userid", GetUserID() );
 		gameeventmanager->FireEvent( event );
 	}
-#endif
 
 	RumbleEffect( RUMBLE_STOP_ALL, 0, RUMBLE_FLAGS_NONE );
 
@@ -5092,11 +5088,9 @@ void CBasePlayer::Precache( void )
 	enginesound->PrecacheSentenceGroup( "HEV" );
 
 	// These are always needed
-#ifndef TF_DLL
 	PrecacheParticleSystem( "slime_splash_01" );
 	PrecacheParticleSystem( "slime_splash_02" );
 	PrecacheParticleSystem( "slime_splash_03" );
-#endif
 
 	// in the event that the player JUST spawned, and the level node graph
 	// was loaded, fix all of the node graph pointers before the game starts.
@@ -7638,34 +7632,16 @@ public:
 	//Inputs
 	void InputReload(inputdata_t &data);
 
-#ifdef HL1_DLL
-	void	MessageThink( void );
-	inline	float	MessageTime( void ) { return m_messageTime; }
-	inline	void	SetMessageTime( float time ) { m_messageTime = time; }
-#endif
-
 private:
 
 	float	m_loadTime;
 	float	m_Duration;
 	float	m_HoldTime;
-
-#ifdef HL1_DLL
-	string_t m_iszMessage;
-	float	m_messageTime;
-#endif
 };
 
 LINK_ENTITY_TO_CLASS( player_loadsaved, CRevertSaved );
 
 BEGIN_DATADESC( CRevertSaved )
-
-#ifdef HL1_DLL
-	DEFINE_KEYFIELD( m_iszMessage, FIELD_STRING, "message" ),
-	DEFINE_KEYFIELD( m_messageTime, FIELD_FLOAT, "messagetime" ),	// These are not actual times, but durations, so save as floats
-
-	DEFINE_FUNCTION( MessageThink ),
-#endif
 
 	DEFINE_KEYFIELD( m_loadTime, FIELD_FLOAT, "loadtime" ),
 	DEFINE_KEYFIELD( m_Duration, FIELD_FLOAT, "duration" ),
@@ -7722,13 +7698,8 @@ void CRevertSaved::InputReload( inputdata_t &inputdata )
 {
 	UTIL_ScreenFadeAll( m_clrRender, Duration(), HoldTime(), FFADE_OUT );
 
-#ifdef HL1_DLL
-	SetNextThink( gpGlobals->curtime + MessageTime() );
-	SetThink( &CRevertSaved::MessageThink );
-#else
 	SetNextThink( gpGlobals->curtime + LoadTime() );
 	SetThink( &CRevertSaved::LoadThink );
-#endif
 
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 
@@ -7743,21 +7714,6 @@ void CRevertSaved::InputReload( inputdata_t &inputdata )
 		g_ServerGameDLL.m_fAutoSaveDangerousMinHealthToCommit = 0.0f;
 	}
 }
-
-#ifdef HL1_DLL
-void CRevertSaved::MessageThink( void )
-{
-	UTIL_ShowMessageAll( STRING( m_iszMessage ) );
-	float nextThink = LoadTime() - MessageTime();
-	if ( nextThink > 0 ) 
-	{
-		SetNextThink( gpGlobals->curtime + nextThink );
-		SetThink( &CRevertSaved::LoadThink );
-	}
-	else
-		LoadThink();
-}
-#endif
 
 
 void CRevertSaved::LoadThink( void )
@@ -9043,12 +8999,7 @@ bool CPlayerInfo::IsHLTV()
 
 bool CPlayerInfo::IsReplay()
 {
-#ifdef TF_DLL // FIXME: Need run-time check for whether replay is enabled
-	Assert( m_pParent );
-	return m_pParent->IsReplay();
-#else
 	return false;
-#endif
 }
 
 bool CPlayerInfo::IsPlayer() 

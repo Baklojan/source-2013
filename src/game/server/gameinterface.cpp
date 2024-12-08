@@ -89,20 +89,6 @@
 #include "querycache.h"
 
 
-#ifdef TF_DLL
-#include "gc_clientsystem.h"
-#include "econ_item_inventory.h"
-#include "steamworks_gamestats.h"
-#include "tf/tf_gc_server.h"
-#include "tf_gamerules.h"
-#include "tf_lobby.h"
-#include "player_vs_environment/tf_population_manager.h"
-#include "workshop/maps_workshop.h"
-
-extern ConVar tf_mm_trusted;
-extern ConVar tf_mm_servermode;
-#endif
-
 #ifdef USE_NAV_MESH
 #include "nav_mesh.h"
 #endif
@@ -216,11 +202,6 @@ INetworkStringTable *g_pStringTableMaterials = NULL;
 INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableServerMapCycle = NULL;
-
-#ifdef TF_DLL
-INetworkStringTable *g_pStringTableServerPopFiles = NULL;
-INetworkStringTable *g_pStringTableServerMapCycleMvM = NULL;
-#endif
 
 CStringTableSaveRestoreOps g_VguiScreenStringOps;
 
@@ -808,18 +789,6 @@ float CServerGameDLL::GetTickInterval( void ) const
 // [Forrest] For Counter-Strike, set default tick rate of 66 and removed -tickrate command line parameter.
 //=============================================================================
 // Ignoring this for now, server ops are abusing it
-#if !defined( TF_DLL ) && !defined( CSTRIKE_DLL ) && !defined( DOD_DLL )
-//=============================================================================
-// HPE_END
-//=============================================================================
-	// override if tick rate specified in command line
-	if ( CommandLine()->CheckParm( "-tickrate" ) )
-	{
-		float tickrate = CommandLine()->ParmValue( "-tickrate", 0 );
-		if ( tickrate > 10 )
-			tickinterval = 1.0f / tickrate;
-	}
-#endif
 
 	return tickinterval;
 }
@@ -1123,12 +1092,6 @@ void CServerGameDLL::GameServerSteamAPIActivated( void )
 		steamgameserverapicontext->SteamGameServer()->GetGameplayStats();
 	}
 #endif
-
-#ifdef TF_DLL
-	GCClientSystem()->GameServerActivate();
-	InventoryManager()->GameServerSteamAPIActivated();
-	TFMapsWorkshop()->GameServerSteamAPIActivated();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1141,9 +1104,6 @@ void CServerGameDLL::GameServerSteamAPIShutdown( void )
 	{
 		steamgameserverapicontext->Clear();
 	}
-#endif
-#ifdef TF_DLL
-	GCClientSystem()->Shutdown();
 #endif
 }
 
@@ -1395,17 +1355,8 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_pStringTableClientSideChoreoScenes = networkstringtable->CreateStringTable( "Scenes", MAX_CHOREO_SCENES_STRINGS );
 	g_pStringTableServerMapCycle = networkstringtable->CreateStringTable( "ServerMapCycle", 128 );
 
-#ifdef TF_DLL
-	g_pStringTableServerPopFiles = networkstringtable->CreateStringTable( "ServerPopFiles", 128 );
-	g_pStringTableServerMapCycleMvM = networkstringtable->CreateStringTable( "ServerMapCycleMvM", 128 );
-#endif
-
 	bool bPopFilesValid = true;
 	(void)bPopFilesValid; // Avoid unreferenced variable warning
-
-#ifdef TF_DLL
-	bPopFilesValid = ( g_pStringTableServerPopFiles != NULL );
-#endif
 
 	Assert( g_pStringTableParticleEffectNames &&
 			g_pStringTableEffectDispatch &&
@@ -1551,59 +1502,6 @@ typedef struct
 // this list gets searched for the first partial match, so some are out of order
 static TITLECOMMENT gTitleComments[] =
 {
-#ifdef HL1_DLL
-	{ "t0a0", "#T0A0TITLE" },
-	{ "c0a0", "#HL1_Chapter1_Title" },
-	{ "c1a0", "#HL1_Chapter2_Title" },
-	{ "c1a1", "#HL1_Chapter3_Title" },
-	{ "c1a2", "#HL1_Chapter4_Title" },
-	{ "c1a3", "#HL1_Chapter5_Title" },
-	{ "c1a4", "#HL1_Chapter6_Title" },
-	{ "c2a1", "#HL1_Chapter7_Title" },
-	{ "c2a2", "#HL1_Chapter8_Title" },
-	{ "c2a3", "#HL1_Chapter9_Title" },
-	{ "c2a4d", "#HL1_Chapter11_Title" },	// These must appear before "C2A4" so all other map names starting with C2A4 get that title
-	{ "c2a4e", "#HL1_Chapter11_Title" },
-	{ "c2a4f", "#HL1_Chapter11_Title" },
-	{ "c2a4g", "#HL1_Chapter11_Title" },
-	{ "c2a4", "#HL1_Chapter10_Title" },
-	{ "c2a5", "#HL1_Chapter12_Title" },
-	{ "c3a1", "#HL1_Chapter13_Title" },
-	{ "c3a2", "#HL1_Chapter14_Title" },
-	{ "c4a1a", "#HL1_Chapter17_Title"  },	// Order is important, see above
-	{ "c4a1b", "#HL1_Chapter17_Title"  },
-	{ "c4a1c", "#HL1_Chapter17_Title"  },
-	{ "c4a1d", "#HL1_Chapter17_Title"  },
-	{ "c4a1e", "#HL1_Chapter17_Title"  },
-	{ "c4a1", "#HL1_Chapter15_Title" },
-	{ "c4a2", "#HL1_Chapter16_Title"  },
-	{ "c4a3", "#HL1_Chapter18_Title"  },
-	{ "c5a1", "#HL1_Chapter19_Title"  },
-#elif defined PORTAL
-	{ "testchmb_a_00",			"#Portal_Chapter1_Title"  },
-	{ "testchmb_a_01",			"#Portal_Chapter1_Title"  },
-	{ "testchmb_a_02",			"#Portal_Chapter2_Title"  },
-	{ "testchmb_a_03",			"#Portal_Chapter2_Title"  },
-	{ "testchmb_a_04",			"#Portal_Chapter3_Title"  },
-	{ "testchmb_a_05",			"#Portal_Chapter3_Title"  },
-	{ "testchmb_a_06",			"#Portal_Chapter4_Title"  },
-	{ "testchmb_a_07",			"#Portal_Chapter4_Title"  },
-	{ "testchmb_a_08_advanced",	"#Portal_Chapter5_Title"  },
-	{ "testchmb_a_08",			"#Portal_Chapter5_Title"  },
-	{ "testchmb_a_09_advanced",	"#Portal_Chapter6_Title"  },
-	{ "testchmb_a_09",			"#Portal_Chapter6_Title"  },
-	{ "testchmb_a_10_advanced",	"#Portal_Chapter7_Title"  },
-	{ "testchmb_a_10",			"#Portal_Chapter7_Title"  },
-	{ "testchmb_a_11_advanced",	"#Portal_Chapter8_Title"  },
-	{ "testchmb_a_11",			"#Portal_Chapter8_Title"  },
-	{ "testchmb_a_13_advanced",	"#Portal_Chapter9_Title"  },
-	{ "testchmb_a_13",			"#Portal_Chapter9_Title"  },
-	{ "testchmb_a_14_advanced",	"#Portal_Chapter10_Title"  },
-	{ "testchmb_a_14",			"#Portal_Chapter10_Title"  },
-	{ "testchmb_a_15",			"#Portal_Chapter11_Title"  },
-	{ "escape_",				"#Portal_Chapter11_Title"  },
-	{ "background2",			"#Portal_Chapter12_Title"  },
-#else
 	{ "intro", "#HL2_Chapter1_Title" },
 
 	{ "d1_trainstation_05", "#HL2_Chapter2_Title" },
@@ -1682,7 +1580,6 @@ static TITLECOMMENT gTitleComments[] =
 	
 	{ "ep2_outland_12a", "#ep2_Chapter7_Title" },
 	{ "ep2_outland_12", "#ep2_Chapter6_Title" },
-#endif
 };
 
 void CServerGameDLL::GetSaveComment( char *text, int maxlength, float flMinutes, float flSeconds, bool bNoTime )
@@ -1783,10 +1680,6 @@ bool CServerGameDLL::ShouldHideServer( void )
 	if ( gpGlobals->eLoadType == MapLoad_Background )
 		return true;
 
-	#if defined( TF_DLL )
-		if ( GTFGCClientSystem()->ShouldHideServer() )
-			return true;
-	#endif
 	return false;
 }
 
@@ -1808,12 +1701,8 @@ void CServerGameDLL::InvalidateMdlCache()
 
 // interface to the new GC based lobby system
 IServerGCLobby *CServerGameDLL::GetServerGCLobby()
-{
-#ifdef TF_DLL
-	return GTFGCClientSystem();
-#else	
+{	
 	return NULL;
-#endif
 }
 
 
@@ -1827,48 +1716,16 @@ void CServerGameDLL::SetServerHibernation( bool bHibernating )
 		ASWGameRules()->OnServerHibernating();
 	}
 #endif
-
-#ifdef TF_DLL
-	GTFGCClientSystem()->SetHibernation( bHibernating );
-#endif
 }
 
 const char *CServerGameDLL::GetServerBrowserMapOverride()
 {
-#ifdef TF_DLL
-	if ( TFGameRules() && TFGameRules()->IsMannVsMachineMode() )
-	{
-		const char *pszFilenameShort = g_pPopulationManager ? g_pPopulationManager->GetPopulationFilenameShort() : NULL;
-		if ( pszFilenameShort && pszFilenameShort[0] )
-		{
-			return pszFilenameShort;
-		}
-	}
-#endif
 	return NULL;
 }
 
 const char *CServerGameDLL::GetServerBrowserGameData()
 {
 	CUtlString sResult;
-
-#ifdef TF_DLL
-	sResult.Format( "tf_mm_trusted:%d,tf_mm_servermode:%d", tf_mm_trusted.GetInt(), tf_mm_servermode.GetInt() );
-
-	CTFLobby *pLobby = GTFGCClientSystem()->GetLobby();
-	if ( pLobby == NULL )
-	{
-		sResult.Append( ",lobby:0" );
-	}
-	else
-	{
-		sResult.Append( CFmtStr( ",lobby:%016llx", pLobby->GetGroupID() ) );
-	}
-	if ( TFGameRules() && TFGameRules()->IsMannVsMachineMode() )
-	{
-		sResult.Append( CFmtStr( ",mannup:%d", ( pLobby && pLobby->GetPlayingForBraggingRights() ) ? 1 : 0  ) );
-	}
-#endif
 
 	static char rchResult[2048];
 	V_strcpy_safe( rchResult, sResult );
@@ -1888,9 +1745,7 @@ void CServerGameDLL::Status( void (*print) (const char *fmt, ...) )
 void CServerGameDLL::PrepareLevelResources( /* in/out */ char *pszMapName, size_t nMapNameSize,
                                             /* in/out */ char *pszMapFile, size_t nMapFileSize )
 {
-#ifdef TF_DLL
-	TFMapsWorkshop()->PrepareLevelResources( pszMapName, nMapNameSize, pszMapFile, nMapFileSize );
-#endif // TF_DLL
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1899,10 +1754,6 @@ CServerGameDLL::AsyncPrepareLevelResources( /* in/out */ char *pszMapName, size_
                                             /* in/out */ char *pszMapFile, size_t nMapFileSize,
                                             float *flProgress /* = NULL */ )
 {
-#ifdef TF_DLL
-	return TFMapsWorkshop()->AsyncPrepareLevelResources( pszMapName, nMapNameSize, pszMapFile, nMapFileSize, flProgress );
-#endif // TF_DLL
-
 	if ( flProgress )
 	{
 		*flProgress = 1.f;
@@ -1913,9 +1764,6 @@ CServerGameDLL::AsyncPrepareLevelResources( /* in/out */ char *pszMapName, size_
 //-----------------------------------------------------------------------------
 IServerGameDLL::eCanProvideLevelResult CServerGameDLL::CanProvideLevel( /* in/out */ char *pMapName, int nMapNameMax )
 {
-#ifdef TF_DLL
-	return TFMapsWorkshop()->OnCanProvideLevel( pMapName, nMapNameMax );
-#endif // TF_DLL
 	return IServerGameDLL::eCanProvideLevel_CannotProvide;
 }
 
@@ -2530,25 +2378,6 @@ void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
 	CSoundEnvelopeController::GetController().CheckLoopingSoundsForPlayer( pPlayer );
 	SceneManager_ClientActive( pPlayer );
-
-	#if defined( TF_DLL )
-		Assert( pPlayer );
-		if ( pPlayer && !pPlayer->IsFakeClient() && !pPlayer->IsHLTV() && !pPlayer->IsReplay() )
-		{
-			CSteamID steamID;
-			if ( pPlayer->GetSteamID( &steamID ) )
-			{
-				GTFGCClientSystem()->ClientActive( steamID );
-			}
-			else
-			{
-				if ( !pPlayer->IsReplay() && !pPlayer->IsHLTV() )
-				{
-					Log("WARNING: ClientActive, but we don't know his SteamID?\n");
-				}
-			}
-		}
-	#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2609,23 +2438,6 @@ void CServerGameClients::ClientDisconnect( edict_t *pEdict )
 		// Make sure anything we "own" is simulated by the server from now on
 		player->ClearPlayerSimulationList();
 #endif
-		#if defined( TF_DLL )
-			if ( !player->IsFakeClient() )
-			{
-				CSteamID steamID;
-				if ( player->GetSteamID( &steamID ) )
-				{
-					GTFGCClientSystem()->ClientDisconnected( steamID );
-				}
-				else
-				{
-					if ( !player->IsReplay() && !player->IsHLTV() )
-					{
-						Log("WARNING: ClientDisconnected, but we don't know his SteamID?\n");
-					}
-				}
-			}
-		#endif
 	}
 }
 

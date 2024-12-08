@@ -42,10 +42,6 @@ public:
 	string_t	m_NoiseArrived;
 
 	CSoundPatch *m_pMovementSound;
-#ifdef HL1_DLL
-	int			m_MoveSound;
-	int			m_StopSound;
-#endif
 
 	float	m_volume;			// Sound volume
 	float	m_flTWidth;
@@ -57,11 +53,6 @@ BEGIN_DATADESC( CBasePlatTrain )
 	DEFINE_KEYFIELD( m_NoiseMoving, FIELD_SOUNDNAME, "noise1" ),
 	DEFINE_KEYFIELD( m_NoiseArrived, FIELD_SOUNDNAME, "noise2" ),
 
-#ifdef HL1_DLL
-	DEFINE_KEYFIELD( m_MoveSound, FIELD_INTEGER, "movesnd" ),
-	DEFINE_KEYFIELD( m_StopSound, FIELD_INTEGER, "stopsnd" ),
-
-#endif 
 	DEFINE_SOUNDPATCH( m_pMovementSound ),
 
 	DEFINE_KEYFIELD( m_volume, FIELD_FLOAT, "volume" ),
@@ -127,90 +118,6 @@ void CBasePlatTrain::Precache( void )
 	//Fill in a default value if necessary
 	UTIL_ValidateSoundName( m_NoiseMoving, "Plat.DefaultMoving" );
 	UTIL_ValidateSoundName( m_NoiseArrived, "Plat.DefaultArrive" );
-
-#ifdef HL1_DLL
-// set the plat's "in-motion" sound
-	switch (m_MoveSound)
-	{
-	default:
-	case	0:
-		m_NoiseMoving = MAKE_STRING( "Plat.DefaultMoving" );
-		break;
-	case	1:
-		m_NoiseMoving = MAKE_STRING("Plat.BigElev1");
-		break;
-	case	2:
-		m_NoiseMoving = MAKE_STRING("Plat.BigElev2");
-		break;
-	case	3:
-		m_NoiseMoving = MAKE_STRING("Plat.TechElev1");
-		break;
-	case	4:
-		m_NoiseMoving = MAKE_STRING("Plat.TechElev2");
-		break;
-	case	5:
-		m_NoiseMoving = MAKE_STRING("Plat.TechElev3");
-		break;
-	case	6:
-		m_NoiseMoving = MAKE_STRING("Plat.FreightElev1");
-		break;
-	case	7:
-		m_NoiseMoving = MAKE_STRING("Plat.FreightElev2");
-		break;
-	case	8:
-		m_NoiseMoving = MAKE_STRING("Plat.HeavyElev");
-		break;
-	case	9:
-		m_NoiseMoving = MAKE_STRING("Plat.RackElev");
-		break;
-	case	10:
-		m_NoiseMoving = MAKE_STRING("Plat.RailElev");
-		break;
-	case	11:
-		m_NoiseMoving = MAKE_STRING("Plat.SqueakElev");
-		break;
-	case	12:
-		m_NoiseMoving = MAKE_STRING("Plat.OddElev1");
-		break;
-	case	13:
-		m_NoiseMoving = MAKE_STRING("Plat.OddElev2");
-		break;
-	}
-
-// set the plat's 'reached destination' stop sound
-	switch (m_StopSound)
-	{
-	default:
-	case	0:
-		m_NoiseArrived = MAKE_STRING( "Plat.DefaultArrive" );
-		break;
-	case	1:
-		m_NoiseArrived = MAKE_STRING("Plat.BigElevStop1");
-		break;
-	case	2:
-		m_NoiseArrived = MAKE_STRING("Plat.BigElevStop2");
-		break;
-	case	3:
-		m_NoiseArrived = MAKE_STRING("Plat.FreightElevStop");
-		break;
-	case	4:
-		m_NoiseArrived = MAKE_STRING("Plat.HeavyElevStop");
-		break;
-	case	5:
-		m_NoiseArrived = MAKE_STRING("Plat.RackStop");
-		break;
-	case	6:
-		m_NoiseArrived = MAKE_STRING("Plat.RailStop");
-		break;
-	case	7:
-		m_NoiseArrived = MAKE_STRING("Plat.SqueakStop");
-		break;
-	case	8:
-		m_NoiseArrived = MAKE_STRING("Plat.QuickStop");
-		break;
-	}
-
-#endif // HL1_DLL
 
 	//Precache them all
 	PrecacheScriptSound( (char *) STRING(m_NoiseMoving) );
@@ -1200,10 +1107,6 @@ BEGIN_DATADESC( CFuncTrackTrain )
 	DEFINE_KEYFIELD( m_flAccelSpeed, FIELD_FLOAT, "ManualAccelSpeed" ),
 	DEFINE_KEYFIELD( m_flDecelSpeed, FIELD_FLOAT, "ManualDecelSpeed" ),
 
-#ifdef HL1_DLL
-	DEFINE_FIELD( m_bOnTrackChange, FIELD_BOOLEAN ),
-#endif
-
 	// Inputs
 	DEFINE_INPUTFUNC( FIELD_VOID, "Stop", InputStop ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "StartForward", InputStartForward ),
@@ -2011,11 +1914,7 @@ void CFuncTrackTrain::UpdateTrainVelocity( CPathTrack *pPrev, CPathTrack *pNext,
 //-----------------------------------------------------------------------------
 TrainOrientationType_t CFuncTrackTrain::GetTrainOrientationType()
 {
-#ifdef HL1_DLL
-	return TrainOrientation_AtPathTracks;
-#else
 	return m_eOrientationType;
-#endif
 }
 
 
@@ -2351,9 +2250,6 @@ void CFuncTrackTrain::Next( void )
 			//
 			m_ppath = pNext;
 			ArriveAtNode( pNext );
-#ifdef HL1_DLL
-			m_bOnTrackChange = false;
-#endif
 
 			//
 			// See if we should teleport to the next path track.
@@ -2618,9 +2514,6 @@ void CFuncTrackTrain::OnRestore( void )
 {
 	BaseClass::OnRestore();
 	if ( !m_ppath 
-#ifdef HL1_DLL
-		&& !m_bOnTrackChange
-#endif	
 		)
 	{
 		NearestPath();
@@ -2678,13 +2571,8 @@ void CFuncTrackTrain::Spawn( void )
 	SetModel( STRING( GetModelName() ) );
 	SetMoveType( MOVETYPE_PUSH );
 
-#ifdef HL1_DLL
-	// BUGBUG: For now, just force this for testing.  Remove if we want to tag all of the trains in the levels
-	SetSolid( SOLID_BSP );
-#else
 	SetSolid( HasSpawnFlags( SF_TRACKTRAIN_HL1TRAIN ) ? SOLID_BSP : SOLID_VPHYSICS );
 	//SetSolid( SOLID_VPHYSICS );
-#endif
 
 	if ( HasSpawnFlags( SF_TRACKTRAIN_UNBLOCKABLE_BY_PLAYER ) )
 	{
@@ -3093,9 +2981,6 @@ void CFuncTrackChange::GoDown( void )
 	{
 		UpdateTrain( m_start );
 		m_train->m_ppath = NULL;
-#ifdef HL1_DLL
-		m_train->m_bOnTrackChange = true;
-#endif
 	}
 }
 

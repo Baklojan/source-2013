@@ -24,10 +24,6 @@
 #include "filesystem.h"
 #include "matsys_controls/matsyscontrols.h"
 
-#if defined( TF_CLIENT_DLL )
-#include "tf_gamerules.h"
-#endif
-
 using namespace vgui;
 
 void MP3Player_Create( vgui::VPANEL parent );
@@ -251,12 +247,7 @@ void VGui_PreRender()
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	loadingdisc->SetLoadingVisible( engine->IsDrawingLoadingImage() && !engine->IsPlayingDemo() );
-#if !defined( TF_CLIENT_DLL )
 	loadingdisc->SetPausedVisible( !enginevgui->IsGameUIVisible() && cl_showpausedimage.GetBool() && engine->IsPaused() && !engine->IsTakingScreenshot() && !engine->IsPlayingDemo() );
-#else
-	bool bShowPausedImage = cl_showpausedimage.GetBool() && ( TFGameRules() && !TFGameRules()->IsInTraining() );
-	loadingdisc->SetPausedVisible( !enginevgui->IsGameUIVisible() && bShowPausedImage && engine->IsPaused() && !engine->IsTakingScreenshot() && !engine->IsPlayingDemo() );
-#endif
 }
 
 void VGui_PostRender()

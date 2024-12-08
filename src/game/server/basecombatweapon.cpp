@@ -60,16 +60,6 @@ void W_Precache(void)
 {
 	PrecacheFileWeaponInfoDatabase( filesystem, g_pGameRules->GetEncryptionKey() );
 
-
-
-#ifdef HL1_DLL
-	g_sModelIndexWExplosion = CBaseEntity::PrecacheModel ("sprites/WXplo1.vmt");// underwater fireball
-	g_sModelIndexBloodSpray = CBaseEntity::PrecacheModel ("sprites/bloodspray.vmt"); // initial blood
-	g_sModelIndexBloodDrop = CBaseEntity::PrecacheModel ("sprites/blood.vmt"); // splattered blood 
-	g_sModelIndexLaserDot = CBaseEntity::PrecacheModel("sprites/laserdot.vmt");
-#endif // HL1_DLL
-
-#ifndef TF_DLL
 	g_sModelIndexFireball = CBaseEntity::PrecacheModel ("sprites/zerogxplode.vmt");// fireball
 
 	g_sModelIndexSmoke = CBaseEntity::PrecacheModel ("sprites/steam1.vmt");// smoke
@@ -83,7 +73,6 @@ void W_Precache(void)
 	CBaseEntity::PrecacheModel ("effects/bubble.vmt");//bubble trails
 
 	CBaseEntity::PrecacheModel("models/weapons/w_bullet.mdl");
-#endif
 
 	CBaseEntity::PrecacheScriptSound( "BaseCombatWeapon.WeaponDrop" );
 	CBaseEntity::PrecacheScriptSound( "BaseCombatWeapon.WeaponMaterialize" );

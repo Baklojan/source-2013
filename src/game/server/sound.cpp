@@ -45,12 +45,7 @@
 #define AMBIENT_GENERIC_UPDATE_RATE	5	// update at 5hz
 #define AMBIENT_GENERIC_THINK_DELAY ( 1.0f / float( AMBIENT_GENERIC_UPDATE_RATE ) )
 
-#ifdef HL1_DLL
-ConVar hl1_ref_db_distance( "hl1_ref_db_distance", "18.0" );
-#define	REFERENCE_dB_DISTANCE	hl1_ref_db_distance.GetFloat()
-#else
 #define REFERENCE_dB_DISTANCE	36.0
-#endif//HL1_DLL
 
 static soundlevel_t ComputeSoundlevel( float radius, bool playEverywhere )
 {

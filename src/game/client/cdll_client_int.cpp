@@ -110,12 +110,6 @@
 #include "matsys_controls/matsyscontrols.h"
 #include "gamestats.h"
 #include "particle_parse.h"
-#if defined( TF_CLIENT_DLL )
-#include "rtime.h"
-#include "tf_hud_disconnect_prompt.h"
-#include "../engine/audio/public/sound.h"
-#include "tf_shared_content_manager.h"
-#endif
 #include "clientsteamcontext.h"
 #include "renamed_recvtable_compat.h"
 #include "mouthinfo.h"
@@ -129,18 +123,10 @@
 #include "haptics/haptic_utils.h"
 #include "haptics/haptic_msgs.h"
 
-#if defined( TF_CLIENT_DLL )
-#include "abuse_report.h"
-#endif
 
 #ifdef USES_ECON_ITEMS
 #include "econ_item_system.h"
 #endif // USES_ECON_ITEMS
-
-#if defined( TF_CLIENT_DLL )
-#include "econ/tool_items/custom_texture_cache.h"
-
-#endif
 
 #ifdef WORKSHOP_IMPORT_ENABLED
 #include "fbxsystem/fbxsystem.h"
@@ -266,11 +252,6 @@ INetworkStringTable *g_pStringTableMaterials = NULL;
 INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableServerMapCycle = NULL;
-
-#ifdef TF_CLIENT_DLL
-INetworkStringTable *g_pStringTableServerPopFiles = NULL;
-INetworkStringTable *g_pStringTableServerMapCycleMvM = NULL;
-#endif
 
 static CGlobalVarsBase dummyvars( true );
 // So stuff that might reference gpGlobals during DLL initialization won't have a NULL pointer.
@@ -995,18 +976,6 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	IGameSystem::Add( ClientSoundscapeSystem() );
 	IGameSystem::Add( PerfVisualBenchmark() );
 	IGameSystem::Add( MumbleSystem() );
-	
-	#if defined( TF_CLIENT_DLL )
-	IGameSystem::Add( CustomTextureToolCacheGameSystem() );
-	IGameSystem::Add( TFSharedContentManager() );
-	#endif
-
-#if defined( TF_CLIENT_DLL )
-	if ( g_AbuseReportMgr != NULL )
-	{
-		IGameSystem::Add( g_AbuseReportMgr );
-	}
-#endif
 
 #if defined( CLIENT_DLL ) && defined( COPY_CHECK_STRESSTEST )
 	IGameSystem::Add( GetPredictionCopyTester() );
@@ -1230,10 +1199,6 @@ void CHLClient::HudProcessInput( bool bActive )
 void CHLClient::HudUpdate( bool bActive )
 {
 	float frametime = gpGlobals->frametime;
-
-#if defined( TF_CLIENT_DLL )
-	CRTime::UpdateRealTime();
-#endif
 
 	GetClientVoiceMgr()->Frame( frametime );
 
@@ -1620,11 +1585,6 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTableInfoPanel = NULL;
 	g_pStringTableClientSideChoreoScenes = NULL;
 	g_pStringTableServerMapCycle = NULL;
-
-#ifdef TF_CLIENT_DLL
-	g_pStringTableServerPopFiles = NULL;
-	g_pStringTableServerMapCycleMvM = NULL;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1678,11 +1638,8 @@ void CHLClient::LevelShutdown( void )
 
 	messagechars->Clear();
 
-#ifndef TF_CLIENT_DLL
-	// don't want to do this for TF2 because we have particle systems in our
-	// character loadout screen that can be viewed when we're not connected to a server
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
-#endif
+
 	UncacheAllMaterials();
 
 	// string tables are cleared on disconnect from a server, so reset our global pointers to NULL
@@ -1847,16 +1804,6 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 	{
 		g_pStringTableServerMapCycle = networkstringtable->FindTable( tableName );
 	}
-#ifdef TF_CLIENT_DLL
-	else if ( !Q_strcasecmp( tableName, "ServerPopFiles" ) )
-	{
-		g_pStringTableServerPopFiles = networkstringtable->FindTable( tableName );
-	}
-	else if ( !Q_strcasecmp( tableName, "ServerMapCycleMvM" ) )
-	{
-		g_pStringTableServerMapCycleMvM = networkstringtable->FindTable( tableName );
-	}
-#endif
 
 	InstallStringTableCallback_GameRules();
 }
@@ -2504,36 +2451,7 @@ void CHLClient::FileReceived( const char * fileName, unsigned int transferID )
 
 void CHLClient::ClientAdjustStartSoundParams( StartSoundParams_t& params )
 {
-#ifdef TF_CLIENT_DLL
-	CBaseEntity *pEntity = ClientEntityList().GetEnt( params.soundsource );
 
-	// A player speaking
-	if ( params.entchannel == CHAN_VOICE && GameRules() && pEntity && pEntity->IsPlayer() )
-	{
-		// Use high-pitched voices for other players if the local player has an item that allows them to hear it (Pyro Goggles)
-		if ( !GameRules()->IsLocalPlayer( params.soundsource ) && IsLocalPlayerUsingVisionFilterFlags( TF_VISION_FILTER_PYRO ) )
-		{
-			params.pitch *= 1.3f;
-		}
-		// Halloween voice futzery?
-		else
-		{
-			float flVoicePitchScale = 1.f;
-			CALL_ATTRIB_HOOK_FLOAT_ON_OTHER( pEntity, flVoicePitchScale, voice_pitch_scale );
-
-			int iHalloweenVoiceSpell = 0;
-			CALL_ATTRIB_HOOK_INT_ON_OTHER( pEntity, iHalloweenVoiceSpell, halloween_voice_modulation );
-			if ( iHalloweenVoiceSpell > 0 )
-			{
-				params.pitch *= 0.8f;
-			}
-			else if( flVoicePitchScale != 1.f )
-			{
-				params.pitch *= flVoicePitchScale;
-			}
-		}
-	}
-#endif
 }
 
 const char* CHLClient::TranslateEffectForVisionFilter( const char *pchEffectType, const char *pchEffectName )
@@ -2547,10 +2465,6 @@ const char* CHLClient::TranslateEffectForVisionFilter( const char *pchEffectType
 bool CHLClient::DisconnectAttempt( void )
 {
 	bool bRet = false;
-
-#if defined( TF_CLIENT_DLL )
-	bRet = HandleDisconnectAttempt();
-#endif
 
 	return bRet;
 }

@@ -14,16 +14,9 @@
 #include "vgui_controls/AnimationController.h"
 #include "c_playerresource.h"
 #include "c_team_objectiveresource.h"
-#if defined( TF_CLIENT_DLL )
-#include "tf_gamerules.h"
-#include "c_tf_player.h"
-#endif // TF_CLIENT_DLL
 #else
 #include "team.h"
 #include "team_objectiveresource.h"
-#if defined( TF_DLL )
-#include "tf_player.h"
-#endif // TF_DLL
 #endif
 
 #define ROUND_TIMER_60SECS	"Announcer.RoundEnds60seconds"
@@ -43,14 +36,6 @@
 #define ROUND_SETUP_3SECS	"Announcer.RoundBegins3Seconds"
 #define ROUND_SETUP_2SECS	"Announcer.RoundBegins2Seconds"
 #define ROUND_SETUP_1SECS	"Announcer.RoundBegins1Seconds"
-
-#ifdef TF_CLIENT_DLL
-#define MERASMUS_SETUP_5SECS	"Merasmus.RoundBegins5Seconds"
-#define MERASMUS_SETUP_4SECS	"Merasmus.RoundBegins4Seconds"
-#define MERASMUS_SETUP_3SECS	"Merasmus.RoundBegins3Seconds"
-#define MERASMUS_SETUP_2SECS	"Merasmus.RoundBegins2Seconds"
-#define MERASMUS_SETUP_1SECS	"Merasmus.RoundBegins1Seconds"
-#endif
 
 #define ROUND_START_BELL	"Ambient.Siren"
 
@@ -81,10 +66,6 @@ enum
 #include "tier0/memdbgon.h"
 
 extern bool IsInCommentaryMode();
-
-#if defined( GAME_DLL ) && defined( TF_DLL )
-ConVar tf_overtime_nag( "tf_overtime_nag", "0", FCVAR_NOTIFY, "Announcer overtime nag." );
-#endif
 
 #ifdef CLIENT_DLL
 
@@ -270,36 +251,7 @@ CTeamRoundTimer::~CTeamRoundTimer( void )
 //-----------------------------------------------------------------------------
 void CTeamRoundTimer::Precache( void )
 {
-#if defined( TF_DLL ) || defined( TF_CLIENT_DLL ) 
-	PrecacheScriptSound( ROUND_TIMER_60SECS );
-	PrecacheScriptSound( ROUND_TIMER_30SECS );
-	PrecacheScriptSound( ROUND_TIMER_10SECS );
-	PrecacheScriptSound( ROUND_TIMER_5SECS );
-	PrecacheScriptSound( ROUND_TIMER_4SECS );
-	PrecacheScriptSound( ROUND_TIMER_3SECS );
-	PrecacheScriptSound( ROUND_TIMER_2SECS );
-	PrecacheScriptSound( ROUND_TIMER_1SECS );
-	PrecacheScriptSound( ROUND_SETUP_60SECS );
-	PrecacheScriptSound( ROUND_SETUP_30SECS );
-	PrecacheScriptSound( ROUND_SETUP_10SECS );
-	PrecacheScriptSound( ROUND_SETUP_5SECS );
-	PrecacheScriptSound( ROUND_SETUP_4SECS );
-	PrecacheScriptSound( ROUND_SETUP_3SECS );
-	PrecacheScriptSound( ROUND_SETUP_2SECS );
-	PrecacheScriptSound( ROUND_SETUP_1SECS );
-	PrecacheScriptSound( ROUND_TIMER_TIME_ADDED );
-	PrecacheScriptSound( ROUND_TIMER_TIME_ADDED_LOSER );
-	PrecacheScriptSound( ROUND_TIMER_TIME_ADDED_WINNER );
-	PrecacheScriptSound( ROUND_START_BELL );
 
-#ifdef TF_CLIENT_DLL
-	PrecacheScriptSound( MERASMUS_SETUP_5SECS );
-	PrecacheScriptSound( MERASMUS_SETUP_4SECS );
-	PrecacheScriptSound( MERASMUS_SETUP_3SECS );
-	PrecacheScriptSound( MERASMUS_SETUP_2SECS );
-	PrecacheScriptSound( MERASMUS_SETUP_1SECS );
-#endif // TF_CLIENT_DLL
-#endif // TF_DLL || TF_CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -591,13 +543,6 @@ const char *CTeamRoundTimer::GetTimeWarningSound( int nWarning )
 	case RT_WARNING_5SECS:
 		if ( m_nState == RT_STATE_SETUP )
 		{
-#ifdef TF_CLIENT_DLL
-			if ( TFGameRules() && TFGameRules()->IsHalloweenScenario( CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY ) )
-			{
-				pszRetVal = MERASMUS_SETUP_5SECS;
-			}
-			else
-#endif
 			{
 				pszRetVal = ROUND_SETUP_5SECS;
 			}
@@ -610,13 +555,6 @@ const char *CTeamRoundTimer::GetTimeWarningSound( int nWarning )
 	case RT_WARNING_4SECS:
 		if ( m_nState == RT_STATE_SETUP )
 		{
-#ifdef TF_CLIENT_DLL
-			if ( TFGameRules() && TFGameRules()->IsHalloweenScenario( CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY ) )
-			{
-				pszRetVal = MERASMUS_SETUP_4SECS;
-			}
-			else
-#endif
 			{
 				pszRetVal = ROUND_SETUP_4SECS;
 			}
@@ -629,13 +567,6 @@ const char *CTeamRoundTimer::GetTimeWarningSound( int nWarning )
 	case RT_WARNING_3SECS:
 		if ( m_nState == RT_STATE_SETUP )
 		{
-#ifdef TF_CLIENT_DLL
-			if ( TFGameRules() && TFGameRules()->IsHalloweenScenario( CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY ) )
-			{
-				pszRetVal = MERASMUS_SETUP_3SECS;
-			}
-			else
-#endif
 			{
 				pszRetVal = ROUND_SETUP_3SECS;
 			}
@@ -648,13 +579,6 @@ const char *CTeamRoundTimer::GetTimeWarningSound( int nWarning )
 	case RT_WARNING_2SECS:
 		if ( m_nState == RT_STATE_SETUP )
 		{
-#ifdef TF_CLIENT_DLL
-			if ( TFGameRules() && TFGameRules()->IsHalloweenScenario( CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY ) )
-			{
-				pszRetVal = MERASMUS_SETUP_2SECS;
-			}
-			else
-#endif
 			{
 				pszRetVal = ROUND_SETUP_2SECS;
 			}
@@ -667,13 +591,6 @@ const char *CTeamRoundTimer::GetTimeWarningSound( int nWarning )
 	case RT_WARNING_1SECS:
 		if ( m_nState == RT_STATE_SETUP )
 		{
-#ifdef TF_CLIENT_DLL
-			if ( TFGameRules() && TFGameRules()->IsHalloweenScenario( CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY ) )
-			{
-				pszRetVal = MERASMUS_SETUP_1SECS;
-			}
-			else
-#endif
 			{
 				pszRetVal = ROUND_SETUP_1SECS;
 			}
@@ -698,12 +615,6 @@ const char *CTeamRoundTimer::GetTimeWarningSound( int nWarning )
 //-----------------------------------------------------------------------------
 void CTeamRoundTimer::SendTimeWarning( int nWarning )
 {
-#if defined( TF_CLIENT_DLL )
-	// don't play any time warnings for Helltower
-	if ( TFGameRules() && TFGameRules()->IsHalloweenScenario( CTFGameRules::HALLOWEEN_SCENARIO_HIGHTOWER ) )
-		return;
-#endif
-
 	// don't play sounds if the level designer has turned them off or if it's during the WaitingForPlayers time
 	if ( !m_bTimerPaused && m_bAutoCountdown && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
 	{
@@ -770,13 +681,6 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 						bShouldPlaySound = true;
 					}
 				}
-
-#ifdef TF_CLIENT_DLL
-				if ( bShouldPlaySound == true )
-				{
-					pPlayer->EmitSound( GetTimeWarningSound( nWarning ) );
-				}
-#endif // TF_CLIENT_DLL
 			}
 		}
 	}
@@ -1002,24 +906,6 @@ void CTeamRoundTimer::RoundTimerThink( void )
 				{
 					TeamplayRoundBasedRules()->SetOvertime( true );
 				}
-#if defined( TF_DLL )
-				else
-				{
-					if ( tf_overtime_nag.GetBool() && ( gpGlobals->curtime > m_flNextOvertimeNag ) )
-					{
-						m_flNextOvertimeNag = gpGlobals->curtime + 1.0f;
-
-						if ( RandomInt( 0, 1 ) > 0 )
-						{
-							IGameEvent *event = gameeventmanager->CreateEvent( "overtime_nag" );
-							if ( event )
-							{
-								gameeventmanager->FireEvent( event );
-							}
-						}
-					}
-				}
-#endif
 			}
 
 			SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05, ROUND_TIMER_THINK );

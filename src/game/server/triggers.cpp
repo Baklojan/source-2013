@@ -362,7 +362,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 		(HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetFlags() & FL_NPC)) ||
 		(HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
 		(HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS) 
-#if defined( HL2_EPISODIC ) || defined( TF_DLL )		
+#if defined( HL2_EPISODIC )	
 		||
 		(	HasSpawnFlags(SF_TRIG_TOUCH_DEBRIS) && 
 			(pOther->GetCollisionGroup() == COLLISION_GROUP_DEBRIS ||
@@ -1634,10 +1634,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 			if ( !playerInPVS )
 			{
 				Warning( "Player isn't in the landmark's (%s) PVS, aborting\n", m_szLandmarkName );
-#ifndef HL1_DLL
-				// HL1 works even with these errors!
 				return;
-#endif
 			}
 		}
 	}
@@ -2312,17 +2309,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 				Vector origin = pOther->GetAbsOrigin();
 				origin.z += 1.0f;
 				pOther->SetAbsOrigin( origin );
-			}
-
-#ifdef HL1_DLL
-			// Apply the z velocity as a force so it counteracts gravity properly
-			Vector vecImpulse( 0, 0, vecPush.z * 0.025 );//magic hack number
-
-			pOther->ApplyAbsVelocityImpulse( vecImpulse );
-
-			// apply x, y as a base velocity so we travel at constant speed on conveyors
-			vecPush.z = 0;
-#endif			
+			}	
 
 			pOther->SetBaseVelocity( vecPush );
 			pOther->AddFlag( FL_BASEVELOCITY );
@@ -2421,19 +2408,11 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	const QAngle *pAngles = NULL;
 	Vector *pVelocity = NULL;
 
-#ifdef HL1_DLL
-	Vector vecZero(0,0,0);		
-#endif
-
 	if (!pentLandmark && !HasSpawnFlags(SF_TELEPORT_PRESERVE_ANGLES) )
 	{
 		pAngles = &pentTarget->GetAbsAngles();
 
-#ifdef HL1_DLL
-		pVelocity = &vecZero;
-#else
 		pVelocity = NULL;	//BUGBUG - This does not set the player's velocity to zero!!!
-#endif
 	}
 
 	tmp += vecLandmarkOffset;
@@ -4951,74 +4930,6 @@ void CTriggerApplyImpulse::InputApplyImpulse( inputdata_t& )
 		}
 	}
 }
-
-#ifdef HL1_DLL
-//----------------------------------------------------------------------------------
-// func_friction
-//----------------------------------------------------------------------------------
-class CFrictionModifier : public CBaseTrigger
-{
-	DECLARE_CLASS( CFrictionModifier, CBaseTrigger );
-
-public:
-	void		Spawn( void );
-	bool		KeyValue( const char *szKeyName, const char *szValue );
-
-	virtual void StartTouch(CBaseEntity *pOther);
-	virtual void EndTouch(CBaseEntity *pOther);
-
-	virtual int	ObjectCaps( void ) { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
-	float		m_frictionFraction;
-
-	DECLARE_DATADESC();
-
-};
-
-LINK_ENTITY_TO_CLASS( func_friction, CFrictionModifier );
-
-BEGIN_DATADESC( CFrictionModifier )
-	DEFINE_FIELD( m_frictionFraction, FIELD_FLOAT ),
-END_DATADESC()
-
-// Modify an entity's friction
-void CFrictionModifier::Spawn( void )
-{
-	BaseClass::Spawn();
-
-	InitTrigger();
-}
-
-// Sets toucher's friction to m_frictionFraction (1.0 = normal friction)
-bool CFrictionModifier::KeyValue( const char *szKeyName, const char *szValue )
-{
-	if (FStrEq(szKeyName, "modifier"))
-	{
-		m_frictionFraction = atof(szValue) / 100.0;
-	}
-	else
-	{
-		BaseClass::KeyValue( szKeyName, szValue );
-	}
-	return true;
-}
-
-void CFrictionModifier::StartTouch( CBaseEntity *pOther )
-{
-	if ( !pOther->IsPlayer() )		// ignore player
-	{
-		pOther->SetFriction( m_frictionFraction );
-	}
-}
-
-void CFrictionModifier::EndTouch( CBaseEntity *pOther )
-{
-	if ( !pOther->IsPlayer() )		// ignore player
-	{
-		pOther->SetFriction( 1.0f );
-	}
-}
-
-#endif //HL1_DLL
 
 bool IsTriggerClass( CBaseEntity *pEntity )
 {

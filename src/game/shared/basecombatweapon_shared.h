@@ -23,11 +23,6 @@
 #define CBaseCombatWeapon C_BaseCombatWeapon
 #endif
 
-// Hacky
-#if defined ( TF_CLIENT_DLL ) || defined ( TF_DLL )
-#include "econ_entity.h"
-#endif // TF_CLIENT_DLL || TF_DLL
-
 #if !defined( CLIENT_DLL )
 extern void OnBaseCombatWeaponCreated( CBaseCombatWeapon * );
 extern void OnBaseCombatWeaponDestroyed( CBaseCombatWeapon * );
@@ -553,16 +548,6 @@ private:
 	CNetworkVar( CBaseCombatCharacterHandle, m_hOwner );				// Player carrying this weapon
 
 protected:
-#if defined ( TF_CLIENT_DLL ) || defined ( TF_DLL )
-	// Regulate crit frequency to reduce client-side seed hacking
-	void					AddToCritBucket( float flAmount );
-	void					RemoveFromCritBucket( float flAmount ) { m_flCritTokenBucket -= flAmount; }
-	bool					IsAllowedToWithdrawFromCritBucket( float flDamage );
-
-	float					m_flCritTokenBucket;
-	int						m_nCritChecks;
-	int						m_nCritSeedRequests;
-#endif // TF
 
 public:
 

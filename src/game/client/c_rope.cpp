@@ -10,10 +10,6 @@
 #include "view.h"
 #include "env_wind_shared.h"
 #include "input.h"
-#ifdef TF_CLIENT_DLL
-#include "cdll_util.h"
-#include "tf_gamerules.h"
-#endif
 #include "rope_helpers.h"
 #include "engine/ivmodelinfo.h"
 #include "tier0/vprof.h"
@@ -641,15 +637,6 @@ bool CRopeManager::IsHolidayLightMode( void )
 		return false;
 	}
 
-#ifdef TF_CLIENT_DLL
-	if ( TFGameRules() && TFGameRules()->IsPowerupMode() )
-	{
-		// We don't want to draw the lights for the grapple.
-		// They get left behind for a while and look bad.
-		return false;
-	}
-#endif
-
 	bool bDrawHolidayLights = false;
 
 #ifdef USES_ECON_ITEMS
@@ -661,15 +648,6 @@ bool CRopeManager::IsHolidayLightMode( void )
 
 	bDrawHolidayLights = m_bDrawHolidayLights;
 	m_nHolidayLightsStyle = 0;
-
-#ifdef TF_CLIENT_DLL
-	// Turn them on in Pyro-vision too
-	if ( IsLocalPlayerUsingVisionFilterFlags( TF_VISION_FILTER_PYRO ) )
-	{
-		bDrawHolidayLights = true;
-		m_nHolidayLightsStyle = 1;
-	}
-#endif // TF_CLIENT_DLL
 
 #endif // USES_ECON_ITEMS
 
@@ -1974,16 +1952,6 @@ bool C_RopeKeyframe::GetEndPointPos( int iPt, Vector &vPos )
 
 IMaterial* C_RopeKeyframe::GetSolidMaterial( void )
 {
-#ifdef TF_CLIENT_DLL
-	if ( RopeManager()->IsHolidayLightMode() )
-	{
-		if ( RopeManager()->GetHolidayLightStyle() == 1 )
-		{
-			return materials->FindMaterial( "cable/pure_white", TEXTURE_GROUP_OTHER );
-		}
-	}
-#endif
-
 	return m_pMaterial;
 }
 IMaterial* C_RopeKeyframe::GetBackMaterial( void )

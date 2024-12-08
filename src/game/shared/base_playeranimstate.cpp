@@ -268,10 +268,8 @@ void CBasePlayerAnimState::ComputeMainSequence()
 	// Export to our outer class..
 	int animDesired = SelectWeightedSequence( TranslateActivity(idealActivity) );
 
-#if !defined( HL1_CLIENT_DLL ) && !defined ( HL1_DLL )
 	if ( !ShouldResetMainSequence( pPlayer->GetSequence(), animDesired ) )
 		return;
-#endif
 
 	if ( animDesired < 0 )
 		 animDesired = 0;

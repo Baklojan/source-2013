@@ -98,11 +98,6 @@ BEGIN_DATADESC( CItem )
 	DEFINE_THINKFUNC( Materialize ),
 	DEFINE_THINKFUNC( ComeToRest ),
 
-#if defined( HL2MP ) || defined( TF_DLL )
-	DEFINE_FIELD( m_flNextResetCheckTime, FIELD_TIME ),
-	DEFINE_THINKFUNC( FallThink ),
-#endif
-
 	// Outputs
 	DEFINE_OUTPUT( m_OnPlayerTouch, "OnPlayerTouch" ),
 	DEFINE_OUTPUT( m_OnCacheInteraction, "OnCacheInteraction" ),
@@ -197,7 +192,7 @@ void CItem::Spawn( void )
 	}
 #endif //CLIENT_DLL
 
-#if defined( HL2MP ) || defined( TF_DLL )
+#if defined( HL2MP )
 	SetThink( &CItem::FallThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 #endif
@@ -267,7 +262,7 @@ void CItem::ComeToRest( void )
 	}
 }
 
-#if defined( HL2MP ) || defined( TF_DLL )
+#if defined( HL2MP )
 
 //-----------------------------------------------------------------------------
 // Purpose: Items that have just spawned run this think to catch them when 
@@ -301,28 +296,6 @@ void CItem::FallThink ( void )
 		HL2MPRules()->AddLevelDesignerPlacedObject( this );
 	}
 #endif // HL2MP
-
-#if defined( TF_DLL )
-	// We only come here if ActivateWhenAtRest() is never called,
-	// which is the case when creating currencypacks in MvM
-	if ( !( GetFlags() & FL_ONGROUND ) )
-	{
-		if ( !GetAbsVelocity().Length() && GetMoveType() == MOVETYPE_FLYGRAVITY )
-		{
-			// Mr. Game, meet Mr. Hammer.  Mr. Hammer, meet the uncooperative Mr. Physics.
-			// Mr. Physics really doesn't want to give our friend the FL_ONGROUND flag.
-			// This means our wonderfully helpful radius currency collection code will be sad.
-			// So in the name of justice, we ask that this flag be delivered unto him.
-
-			SetMoveType( MOVETYPE_NONE );
-			SetGroundEntity( GetWorldEntity() );
-		}
-	}
-	else
-	{
-		SetThink( &CItem::ComeToRest );
-	}
-#endif // TF
 }
 
 #endif // HL2MP, TF
@@ -467,9 +440,7 @@ CBaseEntity* CItem::Respawn( void )
 	UTIL_SetOrigin( this, g_pGameRules->VecItemRespawnSpot( this ) );// blip to whereever you should respawn.
 	SetAbsAngles( g_pGameRules->VecItemRespawnAngles( this ) );// set the angles.
 
-#if !defined( TF_DLL )
 	UTIL_DropToFloor( this, MASK_SOLID );
-#endif
 
 	RemoveAllDecals(); //remove any decals
 

@@ -864,11 +864,7 @@ void CRotButton::Spawn( void )
 
 	SetMoveType( MOVETYPE_PUSH );
 	
-#ifdef HL1_DLL
-	SetSolid( SOLID_BSP );
-#else
 	SetSolid( SOLID_VPHYSICS );
-#endif
 	if ( HasSpawnFlags( SF_ROTBUTTON_NOTSOLID ) )
 	{
 		AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
@@ -1041,11 +1037,7 @@ void CMomentaryRotButton::Spawn( void )
 		UpdateTarget(0,this);
 	}
 
-#ifdef HL1_DLL
-	SetSolid( SOLID_BSP );
-#else
 	SetSolid( SOLID_VPHYSICS );
-#endif
 	if (HasSpawnFlags(SF_ROTBUTTON_NOTSOLID))
 	{
 		AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );

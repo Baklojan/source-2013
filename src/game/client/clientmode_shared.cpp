@@ -57,11 +57,6 @@ extern ConVar replay_rendersetting_renderglow;
 #include "econ_item_view.h"
 #endif
 
-#if defined( TF_CLIENT_DLL )
-#include "c_tf_player.h"
-#include "econ_item_description.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -347,10 +342,6 @@ void ClientModeShared::Init()
 	ListenForGameEvent( "teamplay_broadcast_audio" );
 	ListenForGameEvent( "achievement_earned" );
 
-#if defined( TF_CLIENT_DLL )
-	ListenForGameEvent( "item_found" );
-#endif 
-
 #if defined( REPLAY_ENABLED )
 	ListenForGameEvent( "replay_startrecord" );
 	ListenForGameEvent( "replay_endrecord" );
@@ -476,12 +467,6 @@ bool ClientModeShared::ShouldDrawEntity(C_BaseEntity *pEnt)
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawParticles( )
 {
-#ifdef TF_CLIENT_DLL
-	C_TFPlayer *pTFPlayer = C_TFPlayer::GetLocalTFPlayer();
-	if ( pTFPlayer && !pTFPlayer->ShouldPlayerDrawParticles() )
-		return false;
-#endif // TF_CLIENT_DLL
-
 	return true;
 }
 
@@ -1210,144 +1195,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			}
 		}
 	}
-#if defined( TF_CLIENT_DLL )
-	else if ( Q_strcmp( "item_found", eventname ) == 0 )
-	{
-		int iPlayerIndex = event->GetInt( "player" );
-		entityquality_t iItemQuality = event->GetInt( "quality" );
-		int iMethod = event->GetInt( "method" );
-		int iItemDef = event->GetInt( "itemdef" );
-		bool bIsStrange = event->GetInt( "isstrange" );
-		bool bIsUnusual = event->GetInt( "isunusual" );
-		float flWear = event->GetFloat( "wear" );
 
-		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
-		const GameItemDefinition_t *pItemDefinition = dynamic_cast<GameItemDefinition_t *>( GetItemSchema()->GetItemDefinition( iItemDef ) );
-
-		if ( !pPlayer || !pItemDefinition || pItemDefinition->IsHidden() )
-			return;
-
-		if ( g_PR )
-		{
-			wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
-			g_pVGuiLocalize->ConvertANSIToUnicode( g_PR->GetPlayerName( iPlayerIndex ), wszPlayerName, sizeof( wszPlayerName ) );
-
-			if ( iMethod < 0 || iMethod >= ARRAYSIZE( g_pszItemFoundMethodStrings ) )
-			{
-				iMethod = 0;
-			}
-
-			const char *pszLocString = g_pszItemFoundMethodStrings[iMethod];
-			if ( pszLocString )
-			{
-				wchar_t wszItemFound[256];
-				_snwprintf( wszItemFound, ARRAYSIZE( wszItemFound ), L"%ls", g_pVGuiLocalize->Find( pszLocString ) );
-
-				wchar_t *colorMarker = wcsstr( wszItemFound, L"::" );
-				const CEconItemRarityDefinition* pItemRarity = GetItemSchema()->GetRarityDefinition( pItemDefinition->GetRarity() );
-
-				if ( colorMarker )
-				{	
-					if ( pItemRarity )
-					{
-						attrib_colors_t colorRarity = pItemRarity->GetAttribColor();
-						vgui::HScheme scheme = vgui::scheme()->GetScheme( "ClientScheme" );
-						vgui::IScheme *pScheme = vgui::scheme()->GetIScheme( scheme );
-						Color color = pScheme->GetColor( GetColorNameForAttribColor( colorRarity ), Color( 255, 255, 255, 255 ) );
-						hudChat->SetCustomColor( color );
-					}
-					else
-					{
-						const char *pszQualityColorString = EconQuality_GetColorString( (EEconItemQuality)iItemQuality );
-						if ( pszQualityColorString )
-						{
-							hudChat->SetCustomColor( pszQualityColorString );
-						}
-					}
-
-					*(colorMarker+1) = COLOR_CUSTOM;
-				}
-
-				// TODO: Update the localization strings to only have two format parameters since that's all we need.
-				wchar_t wszLocalizedString[256];
-				g_pVGuiLocalize->ConstructString( 
-					wszLocalizedString, 
-					sizeof( wszLocalizedString ), 
-					LOCCHAR( "%s1" ),
-					1, 
-					CEconItemLocalizedFullNameGenerator( GLocalizationProvider(), pItemDefinition, iItemQuality ).GetFullName()
-				);
-
-				locchar_t tempName[MAX_ITEM_NAME_LENGTH];
-				if ( pItemRarity )
-				{
-					// grade and Wear
-					loc_scpy_safe( tempName, wszLocalizedString );
-
-					const locchar_t *loc_WearText = LOCCHAR("");
-					const char *pszTooltipText = "TFUI_InvTooltip_Rarity";
-
-					if ( !IsWearableSlot( pItemDefinition->GetDefaultLoadoutSlot() ) )
-					{
-						loc_WearText = g_pVGuiLocalize->Find( GetWearLocalizationString( flWear ) );
-					}
-					else
-					{
-						pszTooltipText = "TFUI_InvTooltip_RarityNoWear";
-					}
-
-					g_pVGuiLocalize->ConstructString( wszLocalizedString,
-						ARRAYSIZE( wszLocalizedString ) * sizeof( locchar_t ),
-						g_pVGuiLocalize->Find( pszTooltipText ),
-						3,
-						g_pVGuiLocalize->Find( pItemRarity->GetLocKey() ),
-						tempName,
-						loc_WearText
-					);
-
-					if ( bIsUnusual )
-					{
-						loc_scpy_safe( tempName, wszLocalizedString );
-
-						g_pVGuiLocalize->ConstructString( wszLocalizedString,
-							ARRAYSIZE( wszLocalizedString ) * sizeof( locchar_t ),
-							LOCCHAR( "%s1 %s2" ),
-							2,
-							g_pVGuiLocalize->Find( "rarity4" ),
-							tempName 
-						);
-					}
-
-					if ( bIsStrange )
-					{
-						loc_scpy_safe( tempName, wszLocalizedString );
-
-						g_pVGuiLocalize->ConstructString( wszLocalizedString,
-							ARRAYSIZE( wszLocalizedString ) * sizeof( locchar_t ),
-							LOCCHAR( "%s1 %s2" ),
-							2,
-							g_pVGuiLocalize->Find( "strange" ),
-							tempName
-						);
-					}
-				}
-				
-				loc_scpy_safe( tempName, wszLocalizedString );
-				g_pVGuiLocalize->ConstructString(
-					wszLocalizedString,
-					sizeof( wszLocalizedString ),
-					wszItemFound,
-					3,
-					wszPlayerName, tempName, L"" );
-
-				char szLocalized[256];
-				g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalizedString, szLocalized, sizeof( szLocalized ) );
-
-				hudChat->ChatPrintf( iPlayerIndex, CHAT_FILTER_SERVERMSG, "%s", szLocalized );
-			}
-		}		
-	}
-#endif
 #if defined( REPLAY_ENABLED )
 	else if ( !V_strcmp( "replay_servererror", eventname ) )
 	{
@@ -1445,9 +1293,6 @@ void ClientModeShared::DisplayReplayMessage( const char *pLocalizeName, float fl
 			pPanel->MoveToFront();
 			pPanel->SetKeyBoardInputEnabled( true );
 			pPanel->SetMouseInputEnabled( true );
-#if defined( TF_CLIENT_DLL )
-			TFModalStack()->PushModal( pPanel );
-#endif
 		}
 		else
 		{

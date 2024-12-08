@@ -281,7 +281,6 @@ void UpdateAvatarEffect(void)
 #ifndef CLIENT_DLL
 void HapticsDamage(CBasePlayer* pPlayer, const CTakeDamageInfo &info)
 {
-#if !defined(TF_DLL) && !defined(CSTRIKE_DLL)
 	if(!pPlayer->HasHaptics())
 		return;// do not send to non haptic users.
 
@@ -313,15 +312,6 @@ void HapticsDamage(CBasePlayer* pPlayer, const CTakeDamageInfo &info)
 		// just burn, use the z axis here.
 		pitchAngle = 0.0;
 	}
-#ifdef TERROR
-	else if(
-		(bitDamageType & ( DMG_PARALYZE | DMG_NERVEGAS | DMG_POISON | DMG_RADIATION | DMG_DROWNRECOVER | DMG_ACID | DMG_SLOWBURN ) ) && 
-		(bitDamageType & ~( DMG_PARALYZE | DMG_NERVEGAS | DMG_POISON | DMG_RADIATION | DMG_DROWNRECOVER | DMG_ACID | DMG_SLOWBURN ) )==0 )
-	{
-		// it is time based. and should not really do a punch.
-		return;
-	}
-#endif
 	
 	float sendDamage = info.GetDamage();
 
@@ -329,7 +319,6 @@ void HapticsDamage(CBasePlayer* pPlayer, const CTakeDamageInfo &info)
 	{
 		HapticMsg_HapDmg( pPlayer, pitchAngle, -yawAngle, sendDamage, bitDamageType );
 	}
-#endif
 }
 
 void HapticPunch(CBasePlayer* pPlayer, float x, float y, float z)

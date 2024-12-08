@@ -780,7 +780,6 @@ void CBeam::BeamDamage( trace_t *ptr )
 			VectorNormalize( dir );
 			int nDamageType = DMG_ENERGYBEAM;
 
-#ifndef HL1_DLL
 			if (m_nDissolveType == 0)
 			{
 				nDamageType = DMG_DISSOLVE;
@@ -789,7 +788,6 @@ void CBeam::BeamDamage( trace_t *ptr )
 			{
 				nDamageType = DMG_DISSOLVE | DMG_SHOCK; 
 			}
-#endif
 
 			CTakeDamageInfo info( this, this, m_flDamage * (gpGlobals->curtime - m_flFireTime), nDamageType );
 			CalculateMeleeDamageForce( &info, dir, ptr->endpos );

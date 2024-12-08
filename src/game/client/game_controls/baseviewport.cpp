@@ -232,10 +232,8 @@ void CBaseViewport::CreateDefaultPanels( void )
 	AddNewPanel( CreatePanelByName( PANEL_SCOREBOARD ), "PANEL_SCOREBOARD" );
 	AddNewPanel( CreatePanelByName( PANEL_INFO ), "PANEL_INFO" );
 	AddNewPanel( CreatePanelByName( PANEL_SPECGUI ), "PANEL_SPECGUI" );
-#if !defined( TF_CLIENT_DLL )
 	AddNewPanel( CreatePanelByName( PANEL_SPECMENU ), "PANEL_SPECMENU" );
 	AddNewPanel( CreatePanelByName( PANEL_NAV_PROGRESS ), "PANEL_NAV_PROGRESS" );
-#endif // !TF_CLIENT_DLL
 }
 
 void CBaseViewport::UpdateAllPanels( void )
@@ -282,13 +280,10 @@ IViewPortPanel* CBaseViewport::CreatePanelByName(const char *szPanelName)
 	{
 		newpanel = new CSpectatorGUI( this );
 	}
-#if !defined( TF_CLIENT_DLL )
 	else if ( Q_strcmp(PANEL_NAV_PROGRESS, szPanelName) == 0 )
 	{
 		newpanel = new CNavProgress( this );
 	}
-#endif	// TF_CLIENT_DLL
-
 	if ( Q_strcmp(PANEL_COMMENTARY_MODELVIEWER, szPanelName) == 0 )
 	{
 		newpanel = new CCommentaryModelViewer( this );
@@ -569,11 +564,7 @@ void CBaseViewport::OnThink()
 			m_pActivePanel = NULL;
 	}
 
-	// TF does this in OnTick in TFViewport.  This remains to preserve old
-	// behavior in other games
-#if !defined( TF_CLIENT_DLL )
 	m_pAnimController->UpdateAnimations( gpGlobals->curtime );
-#endif
 
 	int count = m_Panels.Count();
 

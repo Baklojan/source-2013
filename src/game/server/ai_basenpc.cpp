@@ -6824,10 +6824,6 @@ void CAI_BaseNPC::NPCInit ( void )
 	SetIdealActivity( ACT_IDLE );
 	SetActivity( ACT_IDLE );
 
-#ifdef HL1_DLL
-	SetDeathPose( ACT_INVALID );
-#endif
-
 	ClearCommandGoal();
 
 	ClearSchedule( "Initializing NPC" );

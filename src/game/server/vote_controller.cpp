@@ -12,10 +12,6 @@
 #include "gameinterface.h"
 #include "fmtstr.h"
 
-#ifdef TF_DLL
-#include "tf/tf_gamerules.h"
-#include "tf/tf_voteissues.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -43,9 +39,7 @@ ConVar sv_vote_timer_duration( "sv_vote_timer_duration", "15", FCVAR_DEVELOPMENT
 ConVar sv_vote_command_delay( "sv_vote_command_delay", "2", FCVAR_DEVELOPMENTONLY, "How long after a vote passes until the action happens", false, 0.f, true, 4.5f );
 ConVar sv_allow_votes( "sv_allow_votes", "1", FCVAR_NONE, "Allow voting?" );
 ConVar sv_vote_failure_timer( "sv_vote_failure_timer", "300", FCVAR_NONE, "A vote that fails cannot be re-submitted for this long" );
-#ifdef TF_DLL
-ConVar sv_vote_failure_timer_mvm( "sv_vote_failure_timer_mvm", "120", FCVAR_NONE, "A vote that fails in MvM cannot be re-submitted for this long" );
-#endif // TF_DLL
+
 ConVar sv_vote_creation_timer( "sv_vote_creation_timer", "150", FCVAR_NONE, "How long before a player can attempt to call another vote (in seconds)." );
 ConVar sv_vote_quorum_ratio( "sv_vote_quorum_ratio", "0.6", FCVAR_NOTIFY, "The minimum ratio of eligible players needed to pass a vote.  Min 0.5, Max 1.0.", true, 0.1f, true, 1.0f );
 ConVar sv_vote_allow_spectators( "sv_vote_allow_spectators", "0", FCVAR_NONE, "Allow spectators to vote?" );
@@ -331,11 +325,6 @@ int CVoteController::UpdateTransmitState( void )
 //-----------------------------------------------------------------------------
 bool CVoteController::IsVoteSystemEnabled( void )
 {
-#ifdef TF_DLL
-	if ( TFGameRules() && TFGameRules()->IsCompetitiveMode() )
-		return false;
-#endif // TF_DLL
-
 	return sv_allow_votes.GetBool();
 }
 
@@ -827,14 +816,6 @@ bool CVoteController::IsValidVoter( CBasePlayer *pWhom )
 	if ( pWhom->IsReplay() )
 		return false;
 
-#ifdef TF_DLL
-	if ( TFGameRules() && TFGameRules()->IsMannVsMachineMode() )
-	{
-		if ( pWhom->GetTeamNumber() != TF_TEAM_PVE_DEFENDERS )
-			return false;
-	}
-#endif // TF_DLL
-
 	return true;
 }
 
@@ -987,17 +968,6 @@ void CVoteController::AddPlayerToNameLockedList( CSteamID steamID, float flDurat
 //-----------------------------------------------------------------------------
 bool CVoteController::IsPlayerBeingKicked( CBasePlayer *pPlayer )
 {
-#ifdef TF_DLL
-	if ( pPlayer && m_iActiveIssueIndex != INVALID_ISSUE )
-	{
-		CKickIssue *pKickIssue = dynamic_cast< CKickIssue* >( m_potentialIssues[m_iActiveIssueIndex] );
-		if ( pKickIssue )
-		{
-			return pKickIssue->m_hPlayerTarget == pPlayer;
-		}
-	}
-#endif // TF_DLL
-
 	return false;
 }
 
@@ -1085,13 +1055,6 @@ void CBaseIssue::OnVoteFailed( int iEntityHoldingVote )
 			{
 				int nTime = sv_vote_failure_timer.GetInt();
 
-#ifdef TF_DLL
-				if ( TFGameRules() && TFGameRules()->IsMannVsMachineMode() )
-				{
-					nTime = sv_vote_failure_timer_mvm.GetInt();
-				}
-#endif // TF_DLL
-
 				pFailedVote->flLockoutTime = gpGlobals->curtime + nTime;
 
 				return;
@@ -1135,14 +1098,6 @@ bool CBaseIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote_create
 		nTime = m_flNextCallTime - gpGlobals->curtime;
 		return false;
 	}
-
-#ifdef TF_DLL
-	if ( TFGameRules() && TFGameRules()->IsInWaitingForPlayers() && !TFGameRules()->IsInTournamentMode() )
-	{
-		nFailCode = VOTE_FAILED_WAITINGFORPLAYERS;
-		return false;
-	}
-#endif // TF_DLL
 
 	CBaseEntity *pVoteCaller = UTIL_EntityByIndex( iEntIndex );
 	if ( pVoteCaller && !CanTeamCallVote( GetVoterTeam( pVoteCaller ) ) )

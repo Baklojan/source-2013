@@ -34,17 +34,12 @@
 ConVar func_break_max_pieces( "func_break_max_pieces", "15", FCVAR_ARCHIVE | FCVAR_REPLICATED );
 ConVar func_break_reduction_factor( "func_break_reduction_factor", ".5" );
 
-#ifdef HL1_DLL
-extern void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject );
-#endif
-
 extern Vector		g_vecAttackDir;
 
 // Just add more items to the bottom of this array and they will automagically be supported
 // This is done instead of just a classname in the FGD so we can control which entities can
 // be spawned, and still remain fairly flexible
 
-#ifndef HL1_DLL
 	const char *CBreakable::pSpawnObjects[] =
 	{
 		NULL,						// 0
@@ -75,34 +70,6 @@ extern Vector		g_vecAttackDir;
 		"unused (weapon_molotov) 25",// 25
 		"item_dynamic_resupply",	// 26
 	};
-#else
-	// Half-Life 1 spawn objects!
-	const char *CBreakable::pSpawnObjects[] =
-	{
-		NULL,				// 0
-		"item_battery",		// 1
-		"item_healthkit",	// 2
-		"weapon_glock",		// 3
-		"ammo_9mmclip",		// 4
-		"weapon_mp5",		// 5
-		"ammo_9mmAR",		// 6
-		"ammo_ARgrenades",	// 7
-		"weapon_shotgun",	// 8
-		"ammo_buckshot",	// 9
-		"weapon_crossbow",	// 10
-		"ammo_crossbow",	// 11
-		"weapon_357",		// 12
-		"ammo_357",			// 13
-		"weapon_rpg",		// 14
-		"ammo_rpgclip",		// 15
-		"ammo_gaussclip",	// 16
-		"weapon_handgrenade",// 17
-		"weapon_tripmine",	// 18
-		"weapon_satchel",	// 19
-		"weapon_snark",		// 20
-		"weapon_hornetgun",	// 21
-	};
-#endif
 
 const char *pFGDPropData[] =
 {
@@ -406,32 +373,9 @@ void CBreakable::Precache( void )
 		pGibName = "ConcreteChunks";
 		break;
 
-#ifdef HL1_DLL
-	case matComputer:
-		pGibName = "ComputerGibs";
-		break;
-
-	case matCeilingTile:
-		pGibName = "CeilingTile";
-		break;
-
-	case matFlesh:
-		pGibName = "FleshGibs";
-		break;
-
-	case matCinderBlock:
-		pGibName = "CinderBlocks";
-		break;
-
-	case matWeb:
-		pGibName = "WebGibs";
-		break;
-#else
-
 	case matCinderBlock:
 		pGibName = "ConcreteChunks";
 		break;
-#endif
 
 #if HL2_EPISODIC 
 	case matNone:
@@ -448,10 +392,6 @@ void CBreakable::Precache( void )
 	if ( m_iszGibModel != NULL_STRING )
 	{
 		pGibName = STRING(m_iszGibModel);
-
-#ifdef HL1_DLL
-		PrecacheModel( pGibName );
-#endif
 	}
 
 	m_iszModelName = MAKE_STRING( pGibName );
@@ -1068,19 +1008,6 @@ void CBreakable::Die( void )
 	{
 		for ( int i = 0; i < iCount; i++ )
 		{
-
-	#ifdef HL1_DLL
-			// Use the passed model instead of the propdata type
-			const char *modelName = STRING( m_iszModelName );
-			
-			// if the map specifies a model by name
-			if( strstr( modelName, ".mdl" ) != NULL )
-			{
-				iModelIndex = modelinfo->GetModelIndex( modelName );
-			}
-			else	// do the hl2 / normal way
-	#endif
-
 			iModelIndex = modelinfo->GetModelIndex( g_PropDataSystem.GetRandomChunkModel(  STRING( m_iszModelName ) ) );
 
 			// All objects except the first one in this run are marked as slaves...
@@ -1245,11 +1172,6 @@ void CPushable::Spawn( void )
 
 		CreateVPhysics();
 	}
-
-#ifdef HL1_DLL
-	// Force HL1 Pushables to stay axially aligned.
-	VPhysicsGetObject()->SetInertia( Vector( 1e30, 1e30, 1e30 ) );
-#endif//HL1_DLL
 }
 
 
@@ -1270,22 +1192,7 @@ bool CPushable::CreateVPhysics( void )
 // Pull the func_pushable
 void CPushable::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-#ifdef HL1_DLL
-	if( m_spawnflags & SF_PUSH_NO_USE )
-		return;
-
-	// Allow pushables to be dragged by player
-	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
-	if ( pPlayer )
-	{
-		if ( useType == USE_ON )
-		{
-			PlayerPickupObject( pPlayer, this );
-		}
-	}
-#else
 	BaseClass::Use( pActivator, pCaller, useType, value );
-#endif
 }
 
 

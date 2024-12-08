@@ -15,11 +15,6 @@
 #include "engine/IEngineSound.h"
 #include "soundenvelope.h"
 
-#ifdef TF_DLL
-#include "tf_shareddefs.h"
-#include "tf_gamerules.h"
-#endif
-
 #define CONTROL_POINT_UNLOCK_THINK			"UnlockThink"
 
 BEGIN_DATADESC(CTeamControlPoint)
@@ -83,10 +78,6 @@ CTeamControlPoint::CTeamControlPoint()
 
 	m_bLocked = false;
 	m_flUnlockTime = -1;
-
-#ifdef  TF_DLL
-	UseClientSideAnimation();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -100,25 +91,6 @@ void CTeamControlPoint::Spawn( void )
 		Warning( "team_control_point '%s' has bad point_default_owner.\n", GetDebugName() );
 		m_iDefaultOwner = TEAM_UNASSIGNED;
 	}
-
-#ifdef TF_DLL
-	if ( m_iszCaptureStartSound == NULL_STRING )
-	{
-		m_iszCaptureStartSound = AllocPooledString( "Hologram.Start" );
-	}
-	if ( m_iszCaptureEndSound == NULL_STRING )
-	{
-		m_iszCaptureEndSound = AllocPooledString( "Hologram.Stop" );
-	}
-	if ( m_iszCaptureInProgress == NULL_STRING )
-	{
-		m_iszCaptureInProgress = AllocPooledString( "Hologram.Move" );
-	}
-	if ( m_iszCaptureInterrupted == NULL_STRING )
-	{
-		m_iszCaptureInterrupted = AllocPooledString( "Hologram.Interrupted" );
-	}
-#endif
 
 	Precache();
 
@@ -267,11 +239,6 @@ void CTeamControlPoint::Precache( void )
 	{
 		PrecacheScriptSound( STRING( m_iszWarnSound ) );
 	}
-
-#ifdef TF_DLL
-	PrecacheScriptSound( "Announcer.ControlPointContested" );
-	PrecacheScriptSound( "Announcer.ControlPointContested_Neutral" );
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -308,14 +275,6 @@ void CTeamControlPoint::HandleScoring( int iTeam )
 		CTeamControlPointMaster *pMaster = g_hControlPointMasters.Count() ? g_hControlPointMasters[0] : NULL;
 		if ( pMaster && !pMaster->WouldNewCPOwnerWinGame( this, iTeam ) )
 		{
-#ifdef TF_DLL
-			if ( TeamplayRoundBasedRules()->GetGameType() == TF_GAMETYPE_ESCORT )
-			{
-				CBroadcastRecipientFilter filter;
-				EmitSound( filter, entindex(), "Hud.EndRoundScored" );
-			}
-			else
-#endif
 			{
 				CTeamRecipientFilter filter( iTeam );
 				EmitSound( filter, entindex(), "Hud.EndRoundScored" );
@@ -657,13 +616,6 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 
 			CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( playerIndex ) );
 			PlayerCapped( pPlayer );
-
-#ifdef TF_DLL
-			if ( TFGameRules() && TFGameRules()->IsHolidayActive( kHoliday_EOTL ) )
-			{
-				TFGameRules()->DropBonusDuck( pPlayer->GetAbsOrigin(), ToTFPlayer( pPlayer ), NULL, NULL, false, true );
-			}
-#endif
 		}
 
 		// Remap team to get first game team = 1

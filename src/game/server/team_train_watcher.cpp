@@ -18,10 +18,6 @@
 #include "props.h"
 #include "physconstraint.h"
 
-#ifdef TF_DLL
-#include "tf_shareddefs.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 /*
@@ -319,11 +315,7 @@ CTeamTrainWatcher::CTeamTrainWatcher()
 	m_hGlowEnt.Set( NULL );
 #endif // GLOWS_ENABLE
 
-#ifdef TF_DLL
-	ChangeTeam( TF_TEAM_BLUE );
-#else
 	ChangeTeam( TEAM_UNASSIGNED );
-#endif
 /*
 	// create a CTeamTrainWatcherMaster entity
 	if ( g_hTeamTrainWatcherMaster.Get() == NULL )
@@ -1022,10 +1014,8 @@ void CTeamTrainWatcher::WatcherActivate( void )
 	for ( i=0;i<m_iNumCPLinks;i++ )
 	{
 		int iCPIndex = m_CPLinks[i].hCP.Get()->GetPointIndex();
-// This can be pulled once DoD includes team_objectiveresource.* and c_team_objectiveresource.*
-#ifndef DOD_DLL 
+
 		ObjectiveResource()->SetTrainPathDistance( iCPIndex, m_CPLinks[i].flDistanceFromStart / m_flTotalPathDistance );
-#endif
 	}
 
 #ifdef GLOWS_ENABLE
@@ -1524,51 +1514,3 @@ Vector CTeamTrainWatcher::GetNextCheckpointPosition( void ) const
 	Assert( !"No checkpoint found in team train watcher\n" );
 	return vec3_origin;
 }
-
-#if defined( STAGING_ONLY ) && defined( TF_DLL )
-CON_COMMAND_F( tf_dumptrainstats, "Dump the stats for the current train watcher to the console", FCVAR_GAMEDLL )
-{
-	// Listenserver host or rcon access only!
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-
-	CTeamTrainWatcher *pWatcher = NULL;
-	while( ( pWatcher = dynamic_cast< CTeamTrainWatcher * >( gEntList.FindEntityByClassname( pWatcher, "team_train_watcher" ) ) ) != NULL )
-	{
-		pWatcher->DumpStats();
-	}
-}
-
-void CTeamTrainWatcher::DumpStats( void )
-{
-	float flLastPosition = 0.0f;
-	float flTotalDistance = 0.0f;
- 	char szOutput[2048];
-	char szTemp[256];
-
-	V_strcpy_safe( szOutput, "\n\nTrain Watcher stats for team " );
-	V_strcat_safe( szOutput, ( GetTeamNumber() == TF_TEAM_RED ) ? "Red\n" : "Blue\n" );
-
-	for( int i = 0; i < m_iNumCPLinks ; ++i )
-	{
-		float flDistance = m_CPLinks[i].flDistanceFromStart - flLastPosition;
-		if ( i == 0 )
-		{
-			V_sprintf_safe( szTemp, "\tControl Point: %d\tDistance from start: %0.2f\n", i + 1, flDistance );
-		}
-		else
-		{
-			V_sprintf_safe( szTemp, "\tControl Point: %d\tDistance from previous point: %0.2f\n", i + 1, flDistance );
-		}
-		V_strcat_safe( szOutput, szTemp );
-		flTotalDistance += flDistance;
-		flLastPosition = m_CPLinks[i].flDistanceFromStart;
-	}
-
-	V_sprintf_safe( szTemp, "\tTotal Distance: %0.2f\n\n", flTotalDistance ); 
-	V_strcat_safe( szOutput, szTemp );
-	Msg( "%s", szOutput );
-}
-#endif // STAGING_ONLY && TF_DLL
-
-
