@@ -5,14 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#ifndef C_ENVPROJECTEDTEXTURE_H
-#define C_ENVPROJECTEDTEXTURE_H
+#ifndef C_ENV_PROJECTEDTEXTURE_H
+#define C_ENV_PROJECTEDTEXTURE_H
 #ifdef _WIN32
 #pragma once
 #endif
 
 #include "c_baseentity.h"
 #include "basetypes.h"
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -23,9 +24,6 @@ class C_EnvProjectedTexture : public C_BaseEntity
 public:
 	DECLARE_CLIENTCLASS();
 
-	C_EnvProjectedTexture();
-	~C_EnvProjectedTexture();
-
 	virtual void OnDataChanged( DataUpdateType_t updateType );
 	void	ShutDownLightHandle( void );
 
@@ -33,9 +31,8 @@ public:
 
 	void	UpdateLight( bool bForceUpdate );
 
-	bool	ShadowsEnabled();
-
-	float	GetFOV();
+	C_EnvProjectedTexture();
+	~C_EnvProjectedTexture();
 
 private:
 
@@ -49,17 +46,15 @@ private:
 	bool	m_bLightOnlyTarget;
 	bool	m_bLightWorld;
 	bool	m_bCameraSpace;
-	color32	m_cLightColor;
+	Vector	m_LinearFloatLightColor;
 	float	m_flAmbient;
+	float	m_flNearZ;
+	float	m_flFarZ;
 	char	m_SpotlightTextureName[ MAX_PATH ];
 	int		m_nSpotlightTextureFrame;
 	int		m_nShadowQuality;
-	bool	m_bCurrentShadow;
-
-public:
-	C_EnvProjectedTexture  *m_pNext;
 };
 
 C_EnvProjectedTexture* GetEnvProjectedTextureList();
 
-#endif // C_ENVPROJECTEDTEXTURE_H
+#endif // C_ENV_PROJECTEDTEXTURE_H
