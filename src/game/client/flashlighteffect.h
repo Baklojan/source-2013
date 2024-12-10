@@ -18,9 +18,10 @@ class CFlashlightEffect
 public:
 
 	CFlashlightEffect(int nEntIndex = 0);
-	virtual ~CFlashlightEffect();
+	~CFlashlightEffect();
 
-	virtual void UpdateLight(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance);
+	void UpdateLight( const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, bool bTracePlayers );
+	
 	void TurnOn();
 	void TurnOff();
 	bool IsOn( void ) { return m_bIsOn;	}
@@ -30,12 +31,11 @@ public:
 	
 protected:
 
+	bool UpdateDefaultFlashlightState( FlashlightState_t& state, const Vector& vecPos, const Vector& vecForward,
+										const Vector& vecRight, const Vector& vecUp, bool bTracePlayers );
+	bool ComputeLightPosAndOrientation( const Vector& vecPos, const Vector& vecForward, const Vector& vecRight, const Vector& vecUp,
+										Vector& vecFinalPos, Quaternion& quatOrientation, bool bTracePlayers );
 	void LightOff();
-	void LightOffOld();
-	void LightOffNew();
-
-	void UpdateLightNew(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp);
-	void UpdateLightOld(const Vector &vecPos, const Vector &vecDir, int nDistance);
 
 	bool m_bIsOn;
 	int m_nEntIndex;
@@ -43,7 +43,8 @@ protected:
 
 	// Vehicle headlight dynamic light pointer
 	dlight_t *m_pPointLight;
-	float m_flDistMod;
+
+	float m_flCurrentPullBackDist;
 
 	// Texture for flashlight
 	CTextureReference m_FlashlightTexture;
@@ -56,7 +57,7 @@ public:
 	CHeadlightEffect();
 	~CHeadlightEffect();
 
-	virtual void UpdateLight(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance);
+	virtual void UpdateLight( const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance);
 };
 
 
