@@ -1775,7 +1775,6 @@ bool CHalfLife2::ShouldBurningPropsEmitLight()
 // ------------------------------------------------------------------------------------ //
 
 #ifndef HL2MP
-#ifndef PORTAL
 
 // shared ammo definition
 // JAY: Trying to make a more physical bullet response
@@ -1875,5 +1874,4 @@ CAmmoDef *GetAmmoDef()
 	return &def;
 }
 
-#endif
 #endif

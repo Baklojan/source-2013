@@ -2170,27 +2170,6 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 			soundname = "Bounce.Concrete";
 		}
 		break;
-
-#ifdef CSTRIKE_DLL
-
-		case TE_PISTOL_SHELL:
-		{
-			soundname = "Bounce.PistolShell";
-		}
-		break;
-
-		case TE_RIFLE_SHELL:
-		{
-			soundname = "Bounce.RifleShell";
-		}
-		break;
-
-		case TE_SHOTGUN_SHELL:
-		{
-			soundname = "Bounce.ShotgunShell";
-		}
-		break;
-#endif
 	}
 
 	zvel = abs( pTemp->GetVelocity()[2] );
@@ -2384,15 +2363,6 @@ void CTempEnts::LevelInit()
 	m_pShells[0] = (model_t *) engine->LoadModel( "models/weapons/shell.mdl" );
 	m_pShells[1] = (model_t *) engine->LoadModel( "models/weapons/rifleshell.mdl" );
 	m_pShells[2] = (model_t *) engine->LoadModel( "models/weapons/shotgun_shell.mdl" );
-
-#if defined( CSTRIKE_DLL ) || defined ( SDK_DLL )
-	m_pCS_9MMShell		= (model_t *)engine->LoadModel( "models/Shells/shell_9mm.mdl" );
-	m_pCS_57Shell		= (model_t *)engine->LoadModel( "models/Shells/shell_57.mdl" );
-	m_pCS_12GaugeShell	= (model_t *)engine->LoadModel( "models/Shells/shell_12gauge.mdl" );
-	m_pCS_556Shell		= (model_t *)engine->LoadModel( "models/Shells/shell_556.mdl" );
-	m_pCS_762NATOShell	= (model_t *)engine->LoadModel( "models/Shells/shell_762nato.mdl" );
-	m_pCS_338MAGShell	= (model_t *)engine->LoadModel( "models/Shells/shell_338mag.mdl" );
-#endif
 }
 
 
@@ -2416,15 +2386,6 @@ void CTempEnts::Init (void)
 	m_pShells[0] = NULL;
 	m_pShells[1] = NULL;
 	m_pShells[2] = NULL;
-
-#if defined( CSTRIKE_DLL ) || defined ( SDK_DLL )
-	m_pCS_9MMShell		= NULL;
-	m_pCS_57Shell		= NULL;
-	m_pCS_12GaugeShell	= NULL;
-	m_pCS_556Shell		= NULL;
-	m_pCS_762NATOShell	= NULL;
-	m_pCS_338MAGShell	= NULL;
-#endif
 
 	// Clear out lists to start
 	Clear();
@@ -3285,38 +3246,6 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 {
 	const model_t *pModel = NULL;
 	int hitsound = TE_BOUNCE_SHELL;
-
-#if defined ( CSTRIKE_DLL ) || defined ( SDK_DLL )
-
-	switch( shellType )
-	{
-	default:
-	case CS_SHELL_9MM:
-		hitsound = TE_PISTOL_SHELL;
-		pModel = m_pCS_9MMShell;
-		break;
-	case CS_SHELL_57:
-		hitsound = TE_PISTOL_SHELL;
-		pModel = m_pCS_57Shell;
-		break;
-	case CS_SHELL_12GAUGE:
-		hitsound = TE_SHOTGUN_SHELL;
-		pModel = m_pCS_12GaugeShell;
-		break;
-	case CS_SHELL_556:
-		hitsound = TE_RIFLE_SHELL;
-		pModel = m_pCS_556Shell;
-		break;
-	case CS_SHELL_762NATO:
-		hitsound = TE_RIFLE_SHELL;
-		pModel = m_pCS_762NATOShell;
-		break;
-	case CS_SHELL_338MAG:
-		hitsound = TE_RIFLE_SHELL;
-		pModel = m_pCS_338MAGShell;
-		break;
-	}
-#endif
 
 	if ( pModel == NULL )
 		return;

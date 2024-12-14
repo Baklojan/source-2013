@@ -917,7 +917,6 @@ void CAI_ExpresserHost_NPC_DoModifyOrAppendCriteria( CAI_BaseNPC *pSpeaker, AI_C
 // HPE_BEGIN:
 // [Forrest] Remove npc_speakall from Counter-Strike.
 //=============================================================================
-#ifndef CSTRIKE_DLL
 extern CBaseEntity *FindPickerEntity( CBasePlayer *pPlayer );
 CON_COMMAND( npc_speakall, "Force the npc to try and speak all their responses" )
 {
@@ -953,7 +952,6 @@ CON_COMMAND( npc_speakall, "Force the npc to try and speak all their responses" 
 		}
 	}
 }
-#endif
 //=============================================================================
 // HPE_END
 //=============================================================================

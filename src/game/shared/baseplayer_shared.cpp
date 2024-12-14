@@ -64,12 +64,6 @@
 			if ( !pEntity->VPhysicsGetObject() )
 				return false;
 
-#if defined( CSTRIKE_DLL )
-			// don't push the bomb!
-			if ( dynamic_cast<CC4*>( pEntity ) )
-				return false;
-#endif // CSTRIKE_DLL
-
 			return g_pGameRules->CanEntityBeUsePushed( pEntity );
 		}
 	};
@@ -518,13 +512,6 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 	bool onground = ( GetFlags() & FL_ONGROUND );
 	bool movingalongground = ( groundspeed > 0.0001f );
 	bool moving_fast_enough =  ( speed >= velwalk );
-
-#ifdef PORTAL
-	// In Portal we MUST play footstep sounds even when the player is moving very slowly
-	// This is used to count the number of footsteps they take in the challenge mode
-	// -Jeep
-	moving_fast_enough = true;
-#endif
 
 	// To hear step sounds you must be either on a ladder or moving along the ground AND
 	// You must be moving fast enough
@@ -1033,10 +1020,6 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 	// NOTE: Some debris objects are useable too, so hit those as well
 	// A button, etc. can be made out of clip brushes, make sure it's +useable via a traceline, too.
 	int useableContents = MASK_SOLID | CONTENTS_DEBRIS | CONTENTS_PLAYERCLIP;
-
-#ifdef CSTRIKE_DLL
-	useableContents = MASK_NPCSOLID_BRUSHONLY | MASK_OPAQUE_AND_NPCS;
-#endif
 
 #ifndef CLIENT_DLL
 	CBaseEntity *pFoundByTrace = NULL;

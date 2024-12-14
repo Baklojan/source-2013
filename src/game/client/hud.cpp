@@ -372,10 +372,6 @@ CHud gHUD;  // global HUD object
 
 DECLARE_MESSAGE(gHUD, ResetHUD);
 
-#ifdef CSTRIKE_DLL
-DECLARE_MESSAGE(gHUD, SendAudio);
-#endif
-
 CHud::CHud()
 {
 	SetDefLessFunc( m_RenderGroups );
@@ -389,10 +385,6 @@ CHud::CHud()
 void CHud::Init( void )
 {
 	HOOK_HUD_MESSAGE( gHUD, ResetHUD );
-	
-#ifdef CSTRIKE_DLL
-	HOOK_HUD_MESSAGE( gHUD, SendAudio );
-#endif
 
 	InitFonts();
 

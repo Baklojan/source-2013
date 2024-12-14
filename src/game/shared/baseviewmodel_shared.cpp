@@ -75,10 +75,6 @@ void CBaseViewModel::Spawn( void )
 }
 
 
-#if defined ( CSTRIKE_DLL ) && !defined ( CLIENT_DLL )
-#define VGUI_CONTROL_PANELS
-#endif
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -377,9 +373,6 @@ void CBaseViewModel::CalcViewModelView( CBasePlayer *owner, const Vector& eyePos
 		{
 			// add weapon-specific bob 
 			pWeapon->AddViewmodelBob( this, vmorigin, vmangles );
-#if defined ( CSTRIKE_DLL )
-			CalcViewModelLag( vmorigin, vmangles, vmangoriginal );
-#endif
 		}
 	}
 	// Add model-specific bob even if no weapon associated (for head bob for off hand models)

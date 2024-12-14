@@ -655,7 +655,6 @@ void CTeamplayRoundBasedRules::Think( void )
 //-----------------------------------------------------------------------------
 bool CTeamplayRoundBasedRules::TimerMayExpire( void )
 {
-#ifndef CSTRIKE_DLL
 	// team_train_watchers can also prevent timer expiring ( overtime )
 	CTeamTrainWatcher *pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( NULL, "team_train_watcher" ) );
 	while ( pWatcher )
@@ -667,7 +666,6 @@ bool CTeamplayRoundBasedRules::TimerMayExpire( void )
 
 		pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( pWatcher, "team_train_watcher" ) );
 	}
-#endif
 
 	return BaseClass::TimerMayExpire();
 }
@@ -793,7 +791,6 @@ void CTeamplayRoundBasedRules::SetOvertime( bool bOvertime )
 	{
 		// tell train watchers that we've transitioned to overtime
 
-#ifndef CSTRIKE_DLL
 		CTeamTrainWatcher *pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( NULL, "team_train_watcher" ) );
 		while ( pWatcher )
 		{
@@ -802,7 +799,6 @@ void CTeamplayRoundBasedRules::SetOvertime( bool bOvertime )
 
 			pWatcher = dynamic_cast<CTeamTrainWatcher*>( gEntList.FindEntityByClassname( pWatcher, "team_train_watcher" ) );
 		}
-#endif
 	}
 }
 
@@ -860,7 +856,6 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 		// it's not supposed to start paused at the beginning of a round.
 		// We must do this before SetInWaitingForPlayers() is called because it will
 		// restore the timer in the HUD and set the handle to NULL
-#ifndef CSTRIKE_DLL
 		if ( m_hPreviousActiveTimer.Get() )
 		{
 			CTeamRoundTimer *pTimer = dynamic_cast<CTeamRoundTimer*>( m_hPreviousActiveTimer.Get() );
@@ -869,7 +864,6 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 				pTimer->ResumeTimer();
 			}
 		}
-#endif
 		SetInWaitingForPlayers( false );
 		mp_waitingforplayers_cancel.SetValue( 0 );
 	}
@@ -911,7 +905,6 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 				// Stop any timers, and bring up a new one
 				HideActiveTimer();
 
-#ifndef CSTRIKE_DLL
 				variant_t sVariant;
 				m_hWaitingForPlayersTimer = (CTeamRoundTimer*)CBaseEntity::Create( "team_round_timer", vec3_origin, vec3_angle );
 				m_hWaitingForPlayersTimer->SetName( MAKE_STRING("zz_teamplay_waiting_timer") );
@@ -920,7 +913,6 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 				m_hWaitingForPlayersTimer->AcceptInput( "SetTime", NULL, NULL, sVariant, 0 );
 				m_hWaitingForPlayersTimer->AcceptInput( "Resume", NULL, NULL, sVariant, 0 );
 				m_hWaitingForPlayersTimer->AcceptInput( "Enable", NULL, NULL, sVariant, 0 );
-#endif
 			}
 		}
 	}
@@ -1402,7 +1394,6 @@ void CTeamplayRoundBasedRules::State_Enter_PREROUND( void )
 	{
 		if ( CountActivePlayers() > 0 )
 		{
-#ifndef CSTRIKE_DLL
 			variant_t sVariant;
 			if ( !m_hStalemateTimer )
 			{
@@ -1415,7 +1406,6 @@ void CTeamplayRoundBasedRules::State_Enter_PREROUND( void )
 			m_hStalemateTimer->AcceptInput( "SetTime", NULL, NULL, sVariant, 0 );
 			m_hStalemateTimer->AcceptInput( "Resume", NULL, NULL, sVariant, 0 );
 			m_hStalemateTimer->AcceptInput( "Enable", NULL, NULL, sVariant, 0 );
-#endif
 			IGameEvent *timerevent = gameeventmanager->CreateEvent( "teamplay_update_timer" );
 			if ( timerevent  )
 			{
@@ -1732,7 +1722,6 @@ void CTeamplayRoundBasedRules::State_Enter_STALEMATE( void )
 
 	if ( iTimeLimit > 0 )
 	{
-#ifndef CSTRIKE_DLL
 		variant_t sVariant;
 		if ( !m_hStalemateTimer )
 		{
@@ -1744,7 +1733,7 @@ void CTeamplayRoundBasedRules::State_Enter_STALEMATE( void )
 		m_hStalemateTimer->AcceptInput( "SetTime", NULL, NULL, sVariant, 0 );
 		m_hStalemateTimer->AcceptInput( "Resume", NULL, NULL, sVariant, 0 );
 		m_hStalemateTimer->AcceptInput( "Enable", NULL, NULL, sVariant, 0 );
-#endif
+
 		IGameEvent *event = gameeventmanager->CreateEvent( "teamplay_update_timer" );
 		if ( event )
 		{
@@ -2449,7 +2438,6 @@ void CTeamplayRoundBasedRules::ResetPlayerAndTeamReadyState( void )
 //-----------------------------------------------------------------------------
 bool CTeamplayRoundBasedRules::MapHasActiveTimer( void )
 {
-#ifndef CSTRIKE_DLL
 	CBaseEntity *pEntity = NULL;
 	while ( ( pEntity = gEntList.FindEntityByClassname( pEntity, "team_round_timer" ) ) != NULL )
 	{
@@ -2459,7 +2447,7 @@ bool CTeamplayRoundBasedRules::MapHasActiveTimer( void )
 			return true;
 		}
 	}
-#endif
+
 	return false;
 }
 
@@ -2477,7 +2465,6 @@ void CTeamplayRoundBasedRules::CreateTimeLimitTimer( void )
 	if ( !bAllowStalemate )
 		return;
 
-#ifndef CSTRIKE_DLL
 	if ( !m_hTimeLimitTimer )
 	{
 		m_hTimeLimitTimer = (CTeamRoundTimer*)CBaseEntity::Create( "team_round_timer", vec3_origin, vec3_angle );
@@ -2490,7 +2477,6 @@ void CTeamplayRoundBasedRules::CreateTimeLimitTimer( void )
 	m_hTimeLimitTimer->AcceptInput( "SetTime", NULL, NULL, sVariant, 0 );
 	m_hTimeLimitTimer->AcceptInput( "Resume", NULL, NULL, sVariant, 0 );
 	m_hTimeLimitTimer->AcceptInput( "Enable", NULL, NULL, sVariant, 0 );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2776,14 +2762,12 @@ void CTeamplayRoundBasedRules::BalanceTeams( bool bRequireSwitcheesToBeDead )
 	// wrap with this bool, indicates it's a round running switch and not a between rounds insta-switch
 	if ( bRequireSwitcheesToBeDead )
 	{
-#ifndef CSTRIKE_DLL
 		// we don't balance if there is less than 60 seconds on the active timer
 		CTeamRoundTimer *pActiveTimer = GetActiveRoundTimer();
 		if ( pActiveTimer && pActiveTimer->GetTimeRemaining() < 60 )
 		{
 			return;
 		}
-#endif
 	}
 
 	int iHeaviestTeam = TEAM_UNASSIGNED, iLightestTeam = TEAM_UNASSIGNED;

@@ -85,13 +85,8 @@
 ConVar autoaim_max_dist( "autoaim_max_dist", "2160" ); // 2160 = 180 feet
 ConVar autoaim_max_deflect( "autoaim_max_deflect", "0.99" );
 
-#ifdef CSTRIKE_DLL
-ConVar	spec_freeze_time( "spec_freeze_time", "5.0", FCVAR_CHEAT | FCVAR_REPLICATED, "Time spend frozen in observer freeze cam." );
-ConVar	spec_freeze_traveltime( "spec_freeze_traveltime", "0.7", FCVAR_CHEAT | FCVAR_REPLICATED, "Time taken to zoom in to frame a target in observer freeze cam.", true, 0.01, false, 0 );
-#else
 ConVar	spec_freeze_time( "spec_freeze_time", "4.0", FCVAR_CHEAT | FCVAR_REPLICATED, "Time spend frozen in observer freeze cam." );
 ConVar	spec_freeze_traveltime( "spec_freeze_traveltime", "0.4", FCVAR_CHEAT | FCVAR_REPLICATED, "Time taken to zoom in to frame a target in observer freeze cam.", true, 0.01, false, 0 );
-#endif
 
 ConVar sv_bonus_challenge( "sv_bonus_challenge", "0", FCVAR_REPLICATED, "Set to values other than 0 to select a bonus map challenge type." );
 
@@ -106,12 +101,10 @@ static ConVar physicsshadowupdate_render( "physicsshadowupdate_render", "0" );
 bool IsInCommentaryMode( void );
 bool IsListeningToCommentary( void );
 
-#if !defined( CSTRIKE_DLL )
 ConVar cl_sidespeed( "cl_sidespeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
 ConVar cl_upspeed( "cl_upspeed", "320", FCVAR_REPLICATED | FCVAR_CHEAT );
 ConVar cl_forwardspeed( "cl_forwardspeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
 ConVar cl_backspeed( "cl_backspeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
-#endif // CSTRIKE_DLL
 
 // This is declared in the engine, too
 ConVar	sv_noclipduringpause( "sv_noclipduringpause", "0", FCVAR_REPLICATED | FCVAR_CHEAT, "If cheats are enabled, then you can noclip with the game paused (for doing screenshots, etc.)." );
@@ -1040,11 +1033,6 @@ bool CBasePlayer::ShouldTakeDamageInCommentaryMode( const CTakeDamageInfo &input
 	// Allow SetHealth inputs to kill player.
 	if ( inputInfo.GetInflictor() == this && inputInfo.GetAttacker() == this )
 		return true;
-
-#ifdef PORTAL
-	if ( inputInfo.GetDamageType() & DMG_ACID )
-		return true;
-#endif
 
 	// In commentary, ignore all damage except for falling and leeches
 	if ( !(inputInfo.GetDamageType() & (DMG_BURN | DMG_PLASMA | DMG_FALL | DMG_CRUSH)) && inputInfo.GetDamageType() != DMG_GENERIC )
@@ -4543,10 +4531,7 @@ void CBasePlayer::PostThink()
 				// if they've moved too far from the gun, or deployed another weapon, unuse the gun
 				if ( m_hUseEntity->OnControls( this ) && 
 					( !GetActiveWeapon() || GetActiveWeapon()->IsEffectActive( EF_NODRAW ) ||
-					( GetActiveWeapon()->GetActivity() == ACT_VM_HOLSTER ) 
-	#ifdef PORTAL // Portalgun view model stays up when holding an object -Jeep
-					|| FClassnameIs( GetActiveWeapon(), "weapon_portalgun" ) 
-	#endif //#ifdef PORTAL			
+					( GetActiveWeapon()->GetActivity() == ACT_VM_HOLSTER ) 	
 					) )
 				{  
 					m_hUseEntity->Use( this, this, USE_SET, 2 );	// try fire the gun
@@ -5939,26 +5924,7 @@ void CBasePlayer::ImpulseCommands( )
 		{// line hit something, so paint a decal
 			m_flNextDecalTime = gpGlobals->curtime + decalfrequency.GetFloat();
 			CSprayCan *pCan = CREATE_UNSAVED_ENTITY( CSprayCan, "spraycan" );
-			pCan->Spawn( this );
-
-#ifdef CSTRIKE_DLL
-			//=============================================================================
-			// HPE_BEGIN:
-			// [pfreese] Fire off a game event - the Counter-Strike stats manager listens
-			// to these achievements for one of the CS achievements.
-			//=============================================================================
-			
-			IGameEvent * event = gameeventmanager->CreateEvent( "player_decal" );
-			if ( event )
-			{
-				event->SetInt("userid", GetUserID() );
-				gameeventmanager->FireEvent( event );
-			}
-
-			//=============================================================================
-			// HPE_END
-			//=============================================================================
-#endif			
+			pCan->Spawn( this );	
 		}
 
 		break;

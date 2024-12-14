@@ -350,19 +350,6 @@ void CBaseDoor::MovingSoundThink( void )
 void CBaseDoor::StartMovingSound( void )
 {
 	MovingSoundThink();
-
-#ifdef CSTRIKE_DLL // this event is only used by CS:S bots
-
-	CBasePlayer *player = ToBasePlayer(m_hActivator);
-	IGameEvent * event = gameeventmanager->CreateEvent( "door_moving" );
-	if( event )
-	{
-		event->SetInt( "entindex", entindex() );
-		event->SetInt( "userid", (player)?player->GetUserID():0 );
-		gameeventmanager->FireEvent( event );
-	}
-
-#endif
 }
 
 void CBaseDoor::StopMovingSound(void)
