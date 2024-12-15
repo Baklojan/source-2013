@@ -184,5 +184,10 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 	{
 		VertexLitGeneric_DX9_Vars_t vars;
 		SetupVars( vars );
+
+		if ( ( pShaderShadow == NULL ) && ( pShaderAPI != NULL ) && pShaderAPI->InFlashlightMode() ) // Not snapshotting && flashlight pass
+		{
+			Draw( false );
+		}
 	}
 END_SHADER

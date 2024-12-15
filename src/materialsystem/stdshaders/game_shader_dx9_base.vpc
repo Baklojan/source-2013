@@ -54,11 +54,12 @@ $Project
 	$Folder	"Header Files"
 	{
 		$File	"BaseVSShader.h"
-	}
-
-	$Folder	"Link Libraries" [$WIN32]
-	{
-//		$File	"$SRCDIR\dx9sdk\lib\d3dx9.lib"		
+		
+		$File	"common_fxc.h"
+		$File	"common_hlsl_cpp_consts.h"
+		$File	"common_ps_fxc.h"
+		$File	"common_vertexlitgeneric_dx9.h"
+		$File	"common_vs_fxc.h"
 	}
 
 	$Folder "Link Libraries"
