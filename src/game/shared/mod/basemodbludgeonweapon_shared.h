@@ -23,7 +23,7 @@
 #endif
 
 //=========================================================
-// CBaseHLBludgeonWeapon 
+// CBaseModBludgeonWeapon 
 //=========================================================
 class CBaseModBludgeonWeapon : public CBaseModCombatWeapon
 {

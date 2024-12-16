@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "basemodbasebludgeon_shared.h"
+#include "basemodbludgeonweapon_shared.h"
 #include "gamerules.h"
 #include "ammodef.h"
 #include "mathlib/mathlib.h"

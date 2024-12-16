@@ -17,7 +17,7 @@
 
 
 #include "basemodcombatweapon_shared.h"
-#include "basemodbasebludgeon_shared.h"
+#include "basemodbludgeonweapon_shared.h"
 
 
 #ifdef CLIENT_DLL

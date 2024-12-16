@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "npcevent.h"
-#include "basemodbasebludgeon_shared.h"
+#include "basemodbludgeonweapon_shared.h"
 #include "IEffects.h"
 #include "debugoverlay_shared.h"
 
