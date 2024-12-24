@@ -1,12 +1,12 @@
-/*
-Hyperborea (c) by Nicolas @ https://github.com/NicolasDe
-
-Hyperborea is licensed under a
-Creative Commons Attribution-ShareAlike 4.0 International License.
-
-You should have received a copy of the license along with this
-work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
-*/
+//=============================================================================//
+//Hyperborea (c) by Nicolas @ https://github.com/NicolasDe
+//
+//Hyperborea is licensed under a
+//Creative Commons Attribution-ShareAlike 4.0 International License.
+//
+//You should have received a copy of the license along with this
+//work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
+//=============================================================================//
 #pragma once
 
 #include "igameui2.h"
@@ -22,12 +22,12 @@ work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "materialsystem/imaterialsystem.h"
 
-extern IMatSystemSurface *g_pMatSystemSurface;
+extern IMatSystemSurface* g_pMatSystemSurface;
 
 class GameUI2 : public IGameUI2
 {
 public:
-	virtual void Initialize(CreateInterfaceFn AppFactory);
+	virtual void Initialize( CreateInterfaceFn AppFactory );
 	virtual void Shutdown();
 
 	virtual void OnInitialize();
@@ -42,12 +42,12 @@ public:
 	virtual bool IsInMultiplayer();
 	virtual bool IsInLoading();
 
-	virtual void SetView(const CViewSetup& ViewSetup);
-	virtual void SetFrustum(VPlane* Plane);
-	virtual void SetMaskTexture(ITexture* Texture);
-	virtual void SetRenderContext(IMatRenderContext* Context);
+	virtual void SetView( const CViewSetup& ViewSetup );
+	virtual void SetFrustum( VPlane* Plane );
+	virtual void SetMaskTexture( ITexture* Texture );
+	virtual void SetRenderContext( IMatRenderContext* Context );
 
-	virtual wchar_t* ConvertToLocalizedString(const char* Text);
+	virtual wchar_t* ConvertToLocalizedString( const char* Text );
 
 	virtual Vector2D GetViewport() const;
 	virtual vgui::VPANEL GetRootPanel() const;

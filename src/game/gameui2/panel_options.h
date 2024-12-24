@@ -1,12 +1,12 @@
-/*
-Hyperborea (c) by Nicolas @ https://github.com/NicolasDe
-
-Hyperborea is licensed under a
-Creative Commons Attribution-ShareAlike 4.0 International License.
-
-You should have received a copy of the license along with this
-work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
-*/
+//=============================================================================//
+//Hyperborea (c) by Nicolas @ https://github.com/NicolasDe
+//
+//Hyperborea is licensed under a
+//Creative Commons Attribution-ShareAlike 4.0 International License.
+//
+//You should have received a copy of the license along with this
+//work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
+//=============================================================================//
 #pragma once
 
 #include "vgui2d/frame2d.h"
@@ -16,12 +16,12 @@ work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
 
 class Panel_Options : public Frame2D
 {
-	DECLARE_CLASS_SIMPLE(Panel_Options, Frame2D);
+	DECLARE_CLASS_SIMPLE( Panel_Options, Frame2D );
 
 public:
-	Panel_Options(vgui::VPANEL Parent, const char* PanelName);
+	Panel_Options( vgui::VPANEL Parent, const char* PanelName );
 
-	virtual void ApplySchemeSettings(vgui::IScheme* Scheme);
+	virtual void ApplySchemeSettings( vgui::IScheme* Scheme );
 	virtual void OnThink();
 	virtual void SetContentBounds();
 	virtual void Paint();
@@ -31,7 +31,7 @@ public:
 	virtual void DrawTitle();
 	virtual void DrawTabs();
 	virtual void DrawBasicButtons();
-	virtual void OnCommand(char const* Command);
+	virtual void OnCommand( char const* Command );
 
 private:
 	vgui::AnimationController* AnimationController;

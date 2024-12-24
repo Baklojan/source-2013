@@ -1,25 +1,25 @@
-/*
-Hyperborea (c) by Nicolas @ https://github.com/NicolasDe
-
-Hyperborea is licensed under a
-Creative Commons Attribution-ShareAlike 4.0 International License.
-
-You should have received a copy of the license along with this
-work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
-*/
+//=============================================================================//
+//Hyperborea (c) by Nicolas @ https://github.com/NicolasDe
+//
+//Hyperborea is licensed under a
+//Creative Commons Attribution-ShareAlike 4.0 International License.
+//
+//You should have received a copy of the license along with this
+//work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
+//=============================================================================//
 #pragma once
 
 #include "vgui2d/button2d.h"
 
 class Button_MainMenu : public Button2D
 {
-	DECLARE_CLASS_SIMPLE(Button_MainMenu, Button2D);
+	DECLARE_CLASS_SIMPLE( Button_MainMenu, Button2D );
 
 public:
-	Button_MainMenu(vgui::Panel* Parent, vgui::Panel* ActionSignalTarget = nullptr, const char* Command = NULL);
+	Button_MainMenu( vgui::Panel* Parent, vgui::Panel* ActionSignalTarget = nullptr, const char* Command = NULL );
 
 	virtual void Initialize();
-	virtual void ApplySchemeSettings(vgui::IScheme* Scheme);
+	virtual void ApplySchemeSettings( vgui::IScheme* Scheme );
 	virtual void OnThink();
 	virtual void DrawButton();
 	virtual void DrawButton_Blur();
@@ -29,13 +29,13 @@ public:
 	virtual void PaintBlurMask();
 	virtual void Animations();
 
-	virtual void OnMouseReleased(vgui::MouseCode MouseCode);
-	virtual void OnMousePressed(vgui::MouseCode MouseCode);
+	virtual void OnMouseReleased( vgui::MouseCode MouseCode );
+	virtual void OnMousePressed( vgui::MouseCode MouseCode );
 
-	virtual void SetButtonText(const char* Text);
-	virtual void SetButtonDescription(const char* Description);
+	virtual void SetButtonText( const char* Text );
+	virtual void SetButtonDescription( const char* Description );
 
-	virtual void SetPriority(int32 Index) { Priority = Index; }
+	virtual void SetPriority( int32 Index ) { Priority = Index; }
 	int32 GetPriority() const { return Priority; }
 
 private:
@@ -48,17 +48,17 @@ private:
 	int32 TextSizeX;
 	int32 TextSizeY;
 
-	CPanelAnimationVar(float, Width, "Width", "0");
-	CPanelAnimationVar(float, Height, "Height", "0");
-	CPanelAnimationVar(Color, BackgroundColor, "BackgroundColor", "0 0 0 0");
-	CPanelAnimationVar(Color, BackgroundOutlineColor, "BackgroundOutlineColor", "0 0 0 0");
-	CPanelAnimationVar(Color, TextColor, "TextColor", "0 0 0 0");
-	CPanelAnimationVar(Color, TextGlowColor, "TextGlowColor", "0 0 0 0");
-	CPanelAnimationVar(Color, DescriptionColor, "DescriptionColor", "0 0 0 0");
-	CPanelAnimationVar(Color, BackgroundBlurAlpha, "BackgroundBlurAlpha", "0 0 0 0");
+	CPanelAnimationVar( float, Width, "Width", "0" );
+	CPanelAnimationVar( float, Height, "Height", "0" );
+	CPanelAnimationVar( Color, BackgroundColor, "BackgroundColor", "0 0 0 0" );
+	CPanelAnimationVar( Color, BackgroundOutlineColor, "BackgroundOutlineColor", "0 0 0 0" );
+	CPanelAnimationVar( Color, TextColor, "TextColor", "0 0 0 0" );
+	CPanelAnimationVar( Color, TextGlowColor, "TextGlowColor", "0 0 0 0" );
+	CPanelAnimationVar( Color, DescriptionColor, "DescriptionColor", "0 0 0 0" );
+	CPanelAnimationVar( Color, BackgroundBlurAlpha, "BackgroundBlurAlpha", "0 0 0 0" );
 
-	CPanelAnimationVar(float, DescriptionOffsetX, "DescriptionOffsetX", "0");
-	CPanelAnimationVar(float, DescriptionOffsetY, "DescriptionOffsetY", "0");
+	CPanelAnimationVar( float, DescriptionOffsetX, "DescriptionOffsetX", "0" );
+	CPanelAnimationVar( float, DescriptionOffsetY, "DescriptionOffsetY", "0" );
 
 	float WidthOut;
 	float WidthOver;
@@ -73,8 +73,8 @@ private:
 	float TextOffsetX;
 	float TextOffsetY;
 
-//	float DescriptionOffsetX;
-//	float DescriptionOffsetY;
+	//	float DescriptionOffsetX;
+	//	float DescriptionOffsetY;
 	float DescriptionOffsetXOut;
 	float DescriptionOffsetXOver;
 	float DescriptionOffsetXPressed;
