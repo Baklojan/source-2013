@@ -1,0 +1,33 @@
+"lang"
+{
+	"Language "English"
+	"Tokens"
+	{
+		"GameUI2_LogoLeft" "H A L F L I F E 2"
+		"GameUI2_LogoRight" ""
+	
+		"GameUI2_ResumeGame" "Resume game"
+		"GameUI2_ResumeGameDescription" "Return to game."
+
+		"GameUI2_SaveGame" "Save game"
+		"GameUI2_SaveGameDescription" "Save the current game."
+
+		"GameUI2_NewGame" "New game"
+		"GameUI2_NewGameDescription" "Start a new game."
+
+		"GameUI2_LoadGame" "Load game"
+		"GameUI2_LoadGameDescription" "Load a previously saved game."
+
+		"GameUI2_Options" "Configuration"
+		"GameUI2_OptionsDescription" "Change game settings, configure controls."
+
+		"GameUI2_Quit" "Quit"
+		"GameUI2_QuitDescription" "Quit the game"
+
+		"GameUI2_TitleOptions" "Options"
+		
+		"GameUI2_Apply" "Apply"
+		"GameUI2_Back" "Back"
+		"GameUI2_Done" "Done"
+	}
+}
