@@ -75,64 +75,64 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 	filesystem->WriteFile( szFilename, NULL, buf );
 	pKV->deleteThis();
 
-    //=============================================================================
-    // HPE_BEGIN
-    // [dwenger] Steam Cloud Support
-    //=============================================================================
+	//=============================================================================
+	// HPE_BEGIN
+	// [dwenger] Steam Cloud Support
+	//=============================================================================
 
-    if ( bPersistToSteamCloud )
-    {
+	if ( bPersistToSteamCloud )
+	{
 #ifndef NO_STEAM
-        Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
+		Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
 
-        ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
-            SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
+		ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
+			SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
 
-        if (pRemoteStorage)
-        {
-            int32 availableBytes = 0;
-            int32 totalBytes = 0;
-            if ( pRemoteStorage->GetQuota( &totalBytes, &availableBytes ) )
-            {
-                if ( totalBytes > 0 )
-                {
-                    int32   filesize = (int32)filesystem->Size(szFilename);
+		if (pRemoteStorage)
+		{
+			uint64 availableBytes = 0;
+			uint64 totalBytes = 0;
+			if ( pRemoteStorage->GetQuota( &totalBytes, &availableBytes ) )
+			{
+				if ( totalBytes > 0 )
+				{
+					int32   filesize = (int32)filesystem->Size(szFilename);
 
-                    if (filesize > 0)
-                    {
-                        char*   pData = new char[filesize];
+					if (filesize > 0)
+					{
+						char*   pData = new char[filesize];
 
-                        if (pData)
-                        {
-                            // Read in the data from the file system GameState.txt file
-                            FileHandle_t    handle = filesystem->Open(szFilename, "r");
+						if (pData)
+						{
+							// Read in the data from the file system GameState.txt file
+							FileHandle_t    handle = filesystem->Open(szFilename, "r");
 
-                            if (handle)
-                            {
-                                int32 nRead = filesystem->Read(pData, filesize, handle);
+							if (handle)
+							{
+								int32 nRead = filesystem->Read(pData, filesize, handle);
 
-                                filesystem->Close(handle);
+								filesystem->Close(handle);
 
-                                if (nRead == filesize)
-                                {
-                                    // Write out the data to steam cloud
-                                    pRemoteStorage->FileWrite(szFilename, pData, filesize);
-                                }
-                            }
+								if (nRead == filesize)
+								{
+									// Write out the data to steam cloud
+									pRemoteStorage->FileWrite(szFilename, pData, filesize);
+								}
+							}
 
-                            // Delete the data array
-                            delete []pData;
-                        }
-                    }
-                }
-            }
-        }
+							// Delete the data array
+							delete []pData;
+						}
+					}
+				}
+			}
+		}
 #endif
-    }
+	}
 
-    //=============================================================================
-    // HPE_END
-    //=============================================================================
+	//=============================================================================
+	// HPE_END
+	//=============================================================================
 }
 
 //-----------------------------------------------------------------------------
@@ -200,15 +200,6 @@ static CAchievementSaveThread g_AchievementSaveThread;
 //=============================================================================
 
 CAchievementMgr::CAchievementMgr( SteamCloudPersisting ePersistToSteamCloud ) : CAutoGameSystemPerFrame( "CAchievementMgr" )
-
-//=============================================================================
-// HPE_END
-//=============================================================================
-
-#if !defined(NO_STEAM)
-, m_CallbackUserStatsReceived( this, &CAchievementMgr::Steam_OnUserStatsReceived ),
-m_CallbackUserStatsStored( this, &CAchievementMgr::Steam_OnUserStatsStored )
-#endif
 {
 	SetDefLessFunc( m_mapAchievement );
 	SetDefLessFunc( m_mapMetaAchievement );
@@ -222,23 +213,23 @@ m_CallbackUserStatsStored( this, &CAchievementMgr::Steam_OnUserStatsStored )
 	m_bCheatsEverOn = false;
 	m_flTimeLastSaved = 0;
 
-    //=============================================================================
-    // HPE_BEGIN
-    // [dwenger] Steam Cloud Support
-    //=============================================================================
+	//=============================================================================
+	// HPE_BEGIN
+	// [dwenger] Steam Cloud Support
+	//=============================================================================
 
-    if ( ePersistToSteamCloud == SteamCloudPersist_Off )
-    {
-        m_bPersistToSteamCloud = false;
-    }
-    else
-    {
-        m_bPersistToSteamCloud = true;
-    }
+	if ( ePersistToSteamCloud == SteamCloudPersist_Off )
+	{
+		m_bPersistToSteamCloud = false;
+	}
+	else
+	{
+		m_bPersistToSteamCloud = true;
+	}
 
-    //=============================================================================
-    // HPE_END
-    //=============================================================================
+	//=============================================================================
+	// HPE_END
+	//=============================================================================
 
 	m_AchievementsAwarded.RemoveAll();
 }
@@ -559,10 +550,10 @@ bool CAchievementMgr::HasAchieved( const char *pchName )
 void CAchievementMgr::DownloadUserData()
 {
 #ifndef NO_STEAM
-		if ( steamapicontext->SteamUserStats() )
+		if ( SteamUserStats() )
 	{
 		// request stat download; will get called back at OnUserStatsReceived when complete
-			steamapicontext->SteamUserStats()->RequestCurrentStats();
+			SteamUserStats()->RequestCurrentStats();
 	}
 #endif
 }
@@ -591,11 +582,11 @@ const char *COM_GetModDirectory()
 void CAchievementMgr::UploadUserData()
 {
 #ifndef NO_STEAM
-	if ( steamapicontext->SteamUserStats() )
+	if ( SteamUserStats() )
 	{
 		// Upload current Steam client achievements & stats state to Steam.  Will get called back at OnUserStatsStored when complete.
 		// Only values previously set via SteamUserStats() get uploaded
-		steamapicontext->SteamUserStats()->StoreStats();
+		SteamUserStats()->StoreStats();
 		m_bSteamDataDirty = false;
 	}
 #endif
@@ -610,57 +601,57 @@ void CAchievementMgr::LoadGlobalState()
 
 	Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
 
-    //=============================================================================
-    // HPE_BEGIN
-    // [dwenger] Steam Cloud Support
-    //=============================================================================
+	//=============================================================================
+	// HPE_BEGIN
+	// [dwenger] Steam Cloud Support
+	//=============================================================================
 
-    if ( m_bPersistToSteamCloud )
-    {
+	if ( m_bPersistToSteamCloud )
+	{
 #ifndef NO_STEAM
-        ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
-            SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
+		ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
+			SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
 
-        if (pRemoteStorage)
-        {
-            if (pRemoteStorage->FileExists(szFilename))
-            {
-                int32   fileSize = pRemoteStorage->GetFileSize(szFilename);
+		if (pRemoteStorage)
+		{
+			if (pRemoteStorage->FileExists(szFilename))
+			{
+				int32   fileSize = pRemoteStorage->GetFileSize(szFilename);
 
-                if (fileSize > 0)
-                {
-                    // Allocate space for the file data
-                    char*   pData = new char[fileSize];
+				if (fileSize > 0)
+				{
+					// Allocate space for the file data
+					char*   pData = new char[fileSize];
 
-                    if (pData)
-                    {
-                        int32   sizeRead = pRemoteStorage->FileRead(szFilename, pData, fileSize);
+					if (pData)
+					{
+						int32   sizeRead = pRemoteStorage->FileRead(szFilename, pData, fileSize);
 
-                        if (sizeRead == fileSize)
-                        {
-                            // Write out data to a filesystem GameState file that can be read by the original code below
-                            FileHandle_t    handle = filesystem->Open(szFilename, "w");
+						if (sizeRead == fileSize)
+						{
+							// Write out data to a filesystem GameState file that can be read by the original code below
+							FileHandle_t    handle = filesystem->Open(szFilename, "w");
 
-                            if (handle)
-                            {
-                                filesystem->Write(pData, fileSize, handle);
+							if (handle)
+							{
+								filesystem->Write(pData, fileSize, handle);
 
-                                filesystem->Close(handle);
-                            }
-                        }
+								filesystem->Close(handle);
+							}
+						}
 
-                        // Delete the data array
-                        delete []pData;
-                    }
-                }
-            }
-        }
+						// Delete the data array
+						delete []pData;
+					}
+				}
+			}
+		}
 #endif
-    }
+	}
 
-    //=============================================================================
-    // HPE_END
-    //=============================================================================
+	//=============================================================================
+	// HPE_END
+	//=============================================================================
 
 	KeyValues *pKV = new KeyValues("GameState" );
 	if ( pKV->LoadFromFile( filesystem, szFilename, "MOD" ) )
@@ -704,7 +695,7 @@ void CAchievementMgr::SaveGlobalState( bool bAsync )
 			pNode->SetInt( "id", pAchievement->GetAchievementID() );
 
 			pAchievement->GetSettings(pNode);
-        }
+		}
 	}
 
 	if ( !bAsync )
@@ -775,24 +766,24 @@ void CAchievementMgr::AwardAchievement( int iAchievementID )
 	}
 #endif
 
-    //=============================================================================
-    // HPE_BEGIN
-    //=============================================================================
+	//=============================================================================
+	// HPE_BEGIN
+	//=============================================================================
 
-    // [dwenger] Necessary for sorting achievements by award time
+	// [dwenger] Necessary for sorting achievements by award time
 	pAchievement->OnAchieved();
 
-    // [tj]
-    IGameEvent * event = gameeventmanager->CreateEvent( "achievement_earned_local" );
-    if ( event )
-    {
-        event->SetInt( "achievement", pAchievement->GetAchievementID() );
-        gameeventmanager->FireEventClientSide( event );
-    }
+	// [tj]
+	IGameEvent * event = gameeventmanager->CreateEvent( "achievement_earned_local" );
+	if ( event )
+	{
+		event->SetInt( "achievement", pAchievement->GetAchievementID() );
+		gameeventmanager->FireEventClientSide( event );
+	}
 
-    //=============================================================================
-    // HPE_END
-    //=============================================================================
+	//=============================================================================
+	// HPE_END
+	//=============================================================================
 
 	if ( cc_achievement_debug.GetInt() > 0 )
 	{
@@ -804,11 +795,11 @@ void CAchievementMgr::AwardAchievement( int iAchievementID )
 
 
 #ifndef NO_STEAM
-	if ( steamapicontext->SteamUserStats() )
+	if ( SteamUserStats() )
 	{
 		VPROF_BUDGET( "AwardAchievement", VPROF_BUDGETGROUP_STEAM );
 		// set this achieved in the Steam client
-			bool bRet = steamapicontext->SteamUserStats()->SetAchievement( pAchievement->GetName() );
+			bool bRet = SteamUserStats()->SetAchievement( pAchievement->GetName() );
 		//		Assert( bRet );
 		if ( bRet )
 		{
@@ -910,7 +901,7 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 #ifndef NO_STEAM
 		// Cheats get turned on automatically if you run with -dev which many people do internally, so allow cheats if developer is turned on and we're not running
 		// on Steam public
-		if ( developer.GetInt() == 0 || !steamapicontext->SteamUtils() || (k_EUniversePublic == steamapicontext->SteamUtils()->GetConnectedUniverse()) )
+		if ( developer.GetInt() == 0 || !SteamUtils() || (k_EUniversePublic == SteamUtils()->GetConnectedUniverse()) )
 		{
 			Msg( "Achievements disabled: cheats turned on in this app session.\n" );
 			return false;
@@ -919,6 +910,15 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 	}
 
 	return true;
+}
+
+bool CAchievementMgr::LoggedIntoSteam()
+{
+#if !defined( NO_STEAM )
+	return ( SteamUser() && SteamUserStats() && SteamUser()->BLoggedOn() );
+#else
+	return false;
+#endif
 }
 
 #ifdef CLIENT_DLL
@@ -946,7 +946,7 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 	int iLocalPlayerIndex =  GetLocalPlayerIndex();
 
 #ifndef NO_STEAM
-	if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
+	if ( !SteamFriends() || !SteamUtils() || !g_pGameRules->IsMultiplayer() )
 #endif
 		return false;
 	// Loop through the players
@@ -963,8 +963,8 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 				continue;
 #ifndef NO_STEAM
 			// check and see if they're on the local player's friends list
-			CSteamID steamID( pi.friendsID, 1, steamapicontext->SteamUtils()->GetConnectedUniverse(), k_EAccountTypeIndividual );
-			if ( !steamapicontext->SteamFriends()->HasFriend( steamID, /*k_EFriendFlagImmediate*/ 0x04 ) )
+			CSteamID steamID( pi.friendsID, 1, SteamUtils()->GetConnectedUniverse(), k_EAccountTypeIndividual );
+			if ( !SteamFriends()->HasFriend( steamID, /*k_EFriendFlagImmediate*/ 0x04 ) )
 				continue;
 #endif
 			iTotalFriends++;
@@ -988,16 +988,16 @@ bool CalcHasNumClanPlayers( int iClanTeammates )
 	if ( CalcPlayerCount()-1 < iClanTeammates )
 		return false;
 
-	if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
+	if ( !SteamFriends() || !SteamUtils() || !g_pGameRules->IsMultiplayer() )
 		return false;
 
 	// determine local player team
 	int iLocalPlayerIndex =  GetLocalPlayerIndex();
 
-		for ( int iClan = 0; iClan < steamapicontext->SteamFriends()->GetClanCount(); iClan++ )
+		for ( int iClan = 0; iClan < SteamFriends()->GetClanCount(); iClan++ )
 	{
 		int iClanMembersOnTeam = 0;
-		CSteamID clanID = steamapicontext->SteamFriends()->GetClanByIndex( iClan );
+		CSteamID clanID = SteamFriends()->GetClanByIndex( iClan );
 		// enumerate all players
 		for( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
 		{
@@ -1007,8 +1007,8 @@ bool CalcHasNumClanPlayers( int iClanTeammates )
 				if ( engine->GetPlayerInfo( iPlayerIndex, &pi ) && ( pi.friendsID ) )
 				{	
 					// check and see if they're on the local player's friends list
-					CSteamID steamID( pi.friendsID, 1, steamapicontext->SteamUtils()->GetConnectedUniverse(), k_EAccountTypeIndividual );
-					if ( steamapicontext->SteamFriends()->IsUserInSource( steamID, clanID ) )
+					CSteamID steamID( pi.friendsID, 1, SteamUtils()->GetConnectedUniverse(), k_EAccountTypeIndividual );
+					if ( SteamFriends()->IsUserInSource( steamID, clanID ) )
 					{
 						iClanMembersOnTeam++;
 						if ( iClanMembersOnTeam == iClanTeammates )
@@ -1081,9 +1081,9 @@ void CAchievementMgr::ResetAchievements()
 	}
 
 #ifndef NO_STEAM
-	if ( steamapicontext->SteamUserStats() )
+	if ( SteamUserStats() )
 	{
-		steamapicontext->SteamUserStats()->StoreStats();
+		SteamUserStats()->StoreStats();
 	}
 #endif
 	if ( cc_achievement_debug.GetInt() > 0 )
@@ -1106,9 +1106,9 @@ void CAchievementMgr::ResetAchievement( int iAchievementID )
 	{
 		ResetAchievement_Internal( pAchievement );
 #ifndef NO_STEAM
-		if ( steamapicontext->SteamUserStats() )
+		if ( SteamUserStats() )
 		{
-			steamapicontext->SteamUserStats()->StoreStats();
+			SteamUserStats()->StoreStats();
 		}
 #endif
 		if ( cc_achievement_debug.GetInt() > 0 )
@@ -1412,8 +1412,8 @@ int CAchievementMgr::GetAchievementCount()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::Steam_OnUserStatsReceived( UserStatsReceived_t *pUserStatsReceived )
 {
-	Assert( steamapicontext->SteamUserStats() );
-	if ( !steamapicontext->SteamUserStats() )
+	Assert( SteamUserStats() );
+	if ( !SteamUserStats() )
 		return;
 
 	if ( cc_achievement_debug.GetInt() > 0 )
@@ -1475,7 +1475,7 @@ void CAchievementMgr::Steam_OnUserStatsStored( UserStatsStored_t *pUserStatsStor
 						// Get the unlocked time from Steam
 						uint32 unlockTime;
 						bool bAchieved;
-						bool bRet = steamapicontext->SteamUserStats()->GetAchievementAndUnlockTime( pAchievement->GetName(), &bAchieved, &unlockTime );
+						bool bRet = SteamUserStats()->GetAchievementAndUnlockTime( pAchievement->GetName(), &bAchieved, &unlockTime );
 						if ( bRet && bAchieved )
 						{
 							// set the unlock time
@@ -1528,9 +1528,9 @@ void CAchievementMgr::ResetAchievement_Internal( CBaseAchievement *pAchievement 
 	Assert( pAchievement );
 
 #ifndef NO_STEAM
-	if ( steamapicontext->SteamUserStats() )
+	if ( SteamUserStats() )
 	{
-		steamapicontext->SteamUserStats()->ClearAchievement( pAchievement->GetName() );		
+		SteamUserStats()->ClearAchievement( pAchievement->GetName() );		
 	}
 #endif	
 	pAchievement->SetAchieved( false );
@@ -1589,7 +1589,7 @@ void CAchievementMgr::UpdateStateFromSteam_Internal()
 		// Get the achievement status, and the time it was unlocked if unlocked.
 		// If the return value is true, but the unlock time is zero, that means it was unlocked before Steam 
 		// began tracking achievement unlock times (December 2009). Time is seconds since January 1, 1970.
-		bool bRet = steamapicontext->SteamUserStats()->GetAchievementAndUnlockTime( pAchievement->GetName(), &bAchieved, &unlockTime );
+		bool bRet = SteamUserStats()->GetAchievementAndUnlockTime( pAchievement->GetName(), &bAchieved, &unlockTime );
 
 		if ( bRet )
 		{
@@ -1607,7 +1607,7 @@ void CAchievementMgr::UpdateStateFromSteam_Internal()
 			int iValue;
 			char pszProgressName[1024];
 			Q_snprintf( pszProgressName, 1024, "%s_STAT", pAchievement->GetStat() );
-			bRet = steamapicontext->SteamUserStats()->GetStat( pszProgressName, &iValue );
+			bRet = SteamUserStats()->GetStat( pszProgressName, &iValue );
 			if ( bRet )
 			{
 				pAchievement->SetCount( iValue );

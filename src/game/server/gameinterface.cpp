@@ -111,11 +111,6 @@ extern IParticleSystemQuery *g_pParticleSystemQuery;
 extern ConVar commentary;
 
 #ifndef NO_STEAM
-// this context is not available on dedicated servers
-// WARNING! always check if interfaces are available before using
-static CSteamAPIContext s_SteamAPIContext;	
-CSteamAPIContext *steamapicontext = &s_SteamAPIContext;
-
 // this context is not available on a pure client connected to a remote server.
 // WARNING! always check if interfaces are available before using
 static CSteamGameServerAPIContext s_SteamGameServerAPIContext;
@@ -541,7 +536,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( cvar == NULL )
 		return false;
 
-	s_SteamAPIContext.Init();
+	SteamAPI_Init();
 	s_SteamGameServerAPIContext.Init();
 
 	// init each (seperated for ease of debugging)
@@ -733,7 +728,11 @@ void CServerGameDLL::DLLShutdown( void )
 	// reset (shutdown) the gamestatsupload connection
 	gamestatsuploader->InitConnection();
 
-	s_SteamAPIContext.Clear(); // Steam API context shutdown
+	// Steam API context shutdown
+	//s_SteamAPIContext.Clear();
+
+	// Steam API context shutdown
+	SteamAPI_Shutdown();
 	s_SteamGameServerAPIContext.Clear();
 
 	gameeventmanager = NULL;

@@ -23,22 +23,22 @@
 class CAchievementMgr : public CAutoGameSystemPerFrame, public CGameEventListener, public IAchievementMgr
 {
 public:
-    //=============================================================================
-    // HPE_BEGIN
-    // [dwenger] Steam Cloud Support
-    //=============================================================================
+	//=============================================================================
+	// HPE_BEGIN
+	// [dwenger] Steam Cloud Support
+	//=============================================================================
 
-    enum SteamCloudPersisting
-    {
-        SteamCloudPersist_Off = 0,
-        SteamCloudPersist_On,
-    };
+	enum SteamCloudPersisting
+	{
+		SteamCloudPersist_Off = 0,
+		SteamCloudPersist_On,
+	};
 
 	CAchievementMgr( SteamCloudPersisting ePersistToSteamCloud = SteamCloudPersist_Off );
 
-    //=============================================================================
-    // HPE_END
-    //=============================================================================
+	//=============================================================================
+	// HPE_END
+	//=============================================================================
 
 	virtual bool Init();
 	virtual void PostInit();
@@ -98,21 +98,14 @@ public:
 	//=============================================================================
 
 	bool CheckAchievementsEnabled();
-	bool LoggedIntoSteam() 
-	{ 
-#if !defined(NO_STEAM)
-		return ( steamapicontext->SteamUser() && steamapicontext->SteamUserStats() && steamapicontext->SteamUser()->BLoggedOn() ); 
-#else
-		return false;
-#endif
-	}
+	bool LoggedIntoSteam();
 	float GetTimeLastUpload() { return m_flTimeLastSaved; }			// time we last uploaded to Steam
 
 	bool WereCheatsEverOn( void ) { return m_bCheatsEverOn; }
 
 #if !defined(NO_STEAM)
-	STEAM_CALLBACK( CAchievementMgr, Steam_OnUserStatsReceived, UserStatsReceived_t, m_CallbackUserStatsReceived );
-	STEAM_CALLBACK( CAchievementMgr, Steam_OnUserStatsStored, UserStatsStored_t, m_CallbackUserStatsStored );
+	STEAM_CALLBACK( CAchievementMgr, Steam_OnUserStatsReceived, UserStatsReceived_t );
+	STEAM_CALLBACK( CAchievementMgr, Steam_OnUserStatsStored, UserStatsStored_t );
 #endif
 
 	void SetAchievementThink( CBaseAchievement *pAchievement, float flThinkTime );
@@ -149,18 +142,18 @@ private:
 	bool  m_bCheatsEverOn;				// have cheats ever been turned on in this level
 	float m_flTimeLastSaved;			// last time we uploaded to Steam
 
-    //=============================================================================
-    // HPE_BEGIN
-    // [dwenger] Steam Cloud Support
-    //=============================================================================
+	//=============================================================================
+	// HPE_BEGIN
+	// [dwenger] Steam Cloud Support
+	//=============================================================================
 
-    bool  m_bPersistToSteamCloud;       // true = persist data to steam cloud
+	bool  m_bPersistToSteamCloud;       // true = persist data to steam cloud
 
-    //=============================================================================
-    // HPE_END
-    //=============================================================================
+	//=============================================================================
+	// HPE_END
+	//=============================================================================
 
-    CUtlVector<int> m_AchievementsAwarded;
+	CUtlVector<int> m_AchievementsAwarded;
 };
 
 // helper functions
