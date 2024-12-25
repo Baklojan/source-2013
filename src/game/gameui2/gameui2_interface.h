@@ -61,14 +61,14 @@ public:
 	virtual ITexture* GetMaskTexture() const { return MaskTexture; }
 	virtual IMatRenderContext* GetRenderContext() const { return RenderContext; }
 
-	virtual IVEngineClient* GetEngineClient() const { return EngineClient; }
-	virtual IEngineSound* GetEngineSound() const { return EngineSound; }
-	virtual IEngineVGui* GetEngineVGui() const { return EngineVGui; }
-	virtual ISoundEmitterSystemBase* GetSoundEmitterSystemBase() const { return SoundEmitterSystemBase; }
-	virtual IVRenderView* GetRenderView() const { return RenderView; }
-	virtual IMaterialSystem* GetMaterialSystem() const { return MaterialSystem; }
-	virtual IMatSystemSurface* GetMaterialSystemSurface() const { return MaterialSystemSurface; }
-	virtual IGameUI* GetGameUI() const { return GameUI; }
+	virtual IVEngineClient				*GetEngineClient()				const { return EngineClient; }
+	virtual IEngineSound				*GetEngineSound()				const { return EngineSound; }
+	virtual IEngineVGui					*GetEngineVGui()				const { return EngineVGui; }
+	virtual ISoundEmitterSystemBase		*GetSoundEmitterSystemBase()	const { return SoundEmitterSystemBase; }
+	virtual IVRenderView				*GetRenderView()				const { return RenderView; }
+	virtual IMaterialSystem				*GetMaterialSystem()			const { return MaterialSystem; }
+	virtual IMatSystemSurface			*GetMaterialSystemSurface()		const { return MaterialSystemSurface; }
+	virtual IGameUI						*GetGameUI()					const { return GameUI; }
 
 private:
 	CViewSetup View;

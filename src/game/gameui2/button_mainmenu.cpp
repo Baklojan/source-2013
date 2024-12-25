@@ -17,6 +17,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#define DEFAULT_BTN_ARMED_SOUND "ui/button_over.wav"
+#define DEFAULT_BTN_RELEASED_SOUND "ui/button_release.wav"
+
 DECLARE_BUILD_FACTORY_DEFAULT_TEXT( Button_MainMenu, Button_MainMenu );
 
 extern CUtlSymbolTable g_ButtonSoundNames;
@@ -59,9 +62,24 @@ void Button_MainMenu::ApplySchemeSettings( vgui::IScheme* Scheme )
 	SetSelectedColor( Color( 0, 0, 0, 0 ), Color( 0, 0, 0, 0 ) );
 	SetDepressedColor( Color( 0, 0, 0, 0 ), Color( 0, 0, 0, 0 ) );
 	SetBlinkColor( Color( 0, 0, 0, 0 ) );
-	SetArmedSound( "ui/button_over.wav" );
-	SetDepressedSound( "ui/button_click.wav" );
-	SetReleasedSound( "ui/button_release.wav" );
+	
+	const char* pButtonSound = Scheme->GetResourceString( "Button.Sound.Armed" );
+	if ( pButtonSound && *pButtonSound )
+		SetArmedSound( pButtonSound );
+	else
+		SetArmedSound( DEFAULT_BTN_ARMED_SOUND );
+
+	pButtonSound = Scheme->GetResourceString( "Button.Sound.Released" );
+	if ( pButtonSound && *pButtonSound )
+		SetReleasedSound( pButtonSound );
+	else
+		SetReleasedSound( DEFAULT_BTN_RELEASED_SOUND );
+
+	/*pButtonSound = Scheme->GetResourceString("Button.Sound.Depressed");
+	if ( pButtonSound && *pButtonSound )
+		SetDepressedSound( pButtonSound );
+	else
+		SetDepressedSound( "ui/button_click.wav" );*/
 
 	Width = WidthOut = atof( Scheme->GetResourceString( "MainMenu.Button.Width.Out" ) );
 	WidthOver = atof( Scheme->GetResourceString( "MainMenu.Button.Width.Over" ) );

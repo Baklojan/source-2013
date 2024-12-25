@@ -39,6 +39,14 @@ Panel_QuitGame::Panel_QuitGame( vgui::VPANEL Parent, const char* PanelName ) : B
 	SetParent( Parent );
 
 	Activate();
+
+	ButtonQuit = new Button_Panel(this, this, "");
+	ButtonQuit->SetButtonText( "#GameUI2_Quit" );
+	ButtonQuit->SetButtonDescription( "" );
+
+	ButtonBack = new Button_Panel( this, this, "action_back" );
+	ButtonBack->SetButtonText( "#GameUI2_Back" );
+	ButtonBack->SetButtonDescription( "" );
 }
 
 void Panel_QuitGame::OnKillFocus()
@@ -57,8 +65,25 @@ void Panel_QuitGame::Paint()
 {
 	BaseClass::Paint();
 
-	vgui::surface()->DrawSetColor( Color( 0, 0, 0, 255 ) );
+	vgui::surface()->DrawSetColor( Color( 0, 0, 0, 100 ) );
 	vgui::surface()->DrawFilledRect( 0, GetTall() / 2 - 150, GetWide(), 300 + ( GetTall() / 2 - 150 ) );
+}
+
+void Panel_QuitGame::DrawBasicButtons()
+{
+
+}
+
+void Panel_QuitGame::OnCommand( char const* Command )
+{
+	if ( Q_stristr( Command, "action_back" ) )
+	{
+		Close();
+	}
+	else
+	{
+		BaseClass::OnCommand( Command );
+	}
 }
 
 CON_COMMAND( gameui2_openquitgamedialog, "" )

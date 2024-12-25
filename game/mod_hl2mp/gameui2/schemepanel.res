@@ -36,6 +36,11 @@
 		"Panel.Button.Animation.Background"				"0.2"
 		"Panel.Button.Animation.Text"					"0.2"
 		"Panel.Button.Animation.Description"			"0.3"
+		
+		//Sounds
+		"Button.Sound.Armed"							"ui/button_over.wav"
+		"Button.Sound.Released"							"ui/button_release.wav"
+		"Button.Sound.Depressed"						"ui/button_click.wav"
 	}
 
 	"Colors"

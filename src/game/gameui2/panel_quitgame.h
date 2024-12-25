@@ -24,6 +24,12 @@ public:
 	virtual void OnThink();
 	virtual void Paint();
 	virtual void OnKillFocus();
+	virtual void DrawBasicButtons();
+	virtual void OnCommand( char const* Command );
 
 private:
+	Button_Panel* ButtonBack;
+	Button_Panel* ButtonQuit;
+
+	wchar_t* PanelTitle;
 };

@@ -220,7 +220,7 @@ void MainMenu::OnSetFocus()
 	UpdateMenu();
 
 	bIsVisible = true;
-	vgui::surface()->PlaySound( "interface/ui/menu_open.wav" );
+	//vgui::surface()->PlaySound( "ui/menu_open.wav" );
 }
 
 void MainMenu::OnKillFocus()
@@ -228,7 +228,7 @@ void MainMenu::OnKillFocus()
 	BaseClass::OnKillFocus();
 
 	bIsVisible = false;
-	vgui::surface()->PlaySound( "interface/ui/menu_close.wav" );
+	//vgui::surface()->PlaySound( "ui/menu_close.wav" );
 }
 
 void MainMenu::UpdateMenu()

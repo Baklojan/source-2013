@@ -32,27 +32,33 @@ void GameUI2::Initialize( CreateInterfaceFn AppFactory )
 	ConVar_Register( FCVAR_CLIENTDLL );
 	ConnectTier3Libraries( &AppFactory, 1 );
 
-	EngineClient = (IVEngineClient*)AppFactory( VENGINE_CLIENT_INTERFACE_VERSION, NULL );
-	EngineSound = (IEngineSound*)AppFactory( IENGINESOUND_CLIENT_INTERFACE_VERSION, NULL );
-	EngineVGui = (IEngineVGui*)AppFactory( VENGINE_VGUI_VERSION, NULL );
-	SoundEmitterSystemBase = (ISoundEmitterSystemBase*)AppFactory( SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL );
-	RenderView = (IVRenderView*)AppFactory( VENGINE_RENDERVIEW_INTERFACE_VERSION, NULL );
-	MaterialSystem = (IMaterialSystem*)AppFactory( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
-	MaterialSystemSurface = (IMatSystemSurface*)AppFactory( MAT_SYSTEM_SURFACE_INTERFACE_VERSION, NULL );
+	EngineClient				= (IVEngineClient*)				AppFactory( VENGINE_CLIENT_INTERFACE_VERSION, NULL );
+	EngineSound					= (IEngineSound*)				AppFactory( IENGINESOUND_CLIENT_INTERFACE_VERSION, NULL );
+	EngineVGui					= (IEngineVGui*)				AppFactory( VENGINE_VGUI_VERSION, NULL );
+	SoundEmitterSystemBase		= (ISoundEmitterSystemBase*)	AppFactory( SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL );
+	RenderView					= (IVRenderView*)				AppFactory( VENGINE_RENDERVIEW_INTERFACE_VERSION, NULL );
+	MaterialSystem				= (IMaterialSystem*)			AppFactory( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
+	MaterialSystemSurface		= (IMatSystemSurface*)			AppFactory( MAT_SYSTEM_SURFACE_INTERFACE_VERSION, NULL );
 
 	CreateInterfaceFn GameUIFactory = StaticGameUI.GetFactory();
 	if ( GameUIFactory )
-		GameUI = (IGameUI*)GameUIFactory( GAMEUI_INTERFACE_VERSION, NULL );
+		GameUI = (IGameUI*) GameUIFactory( GAMEUI_INTERFACE_VERSION, NULL );
 
-	if ( EngineClient == nullptr ||
-		EngineSound == nullptr ||
-		EngineVGui == nullptr ||
-		SoundEmitterSystemBase == nullptr ||
-		RenderView == nullptr ||
-		MaterialSystem == nullptr ||
-		MaterialSystemSurface == nullptr ||
-		GameUI == nullptr )
+	bool bFailed = !EngineClient			||
+					!EngineSound			||
+					!EngineVGui				||
+					!SoundEmitterSystemBase ||
+					!RenderView				||
+					!MaterialSystem			||
+					!MaterialSystemSurface	||
+					!GameUI;
+	if ( bFailed )
+	{
 		Error( "GameUI2 failed to get necessary interfaces.\n" );
+		return;
+	}
+
+	g_pVGuiLocalize->AddFile( "gameui2/localization/gameui2_%language%.txt", "GAME", true );
 
 	GetBasePanel()->Create();
 
