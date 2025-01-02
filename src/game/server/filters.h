@@ -57,4 +57,172 @@ protected:
 	virtual bool PassesDamageFilterImpl(const CTakeDamageInfo &info);
 };
 
+
+// ###################################################################
+//	> FilterMultiple
+//
+//   Allows one to filter through mutiple filters
+// ###################################################################
+#define MAX_FILTERS 5
+enum filter_t
+{
+	FILTER_AND,
+	FILTER_OR,
+};
+
+class CFilterMultiple : public CBaseFilter
+{
+	DECLARE_CLASS( CFilterMultiple, CBaseFilter );
+	DECLARE_DATADESC();
+
+	filter_t	m_nFilterType;
+	string_t	m_iFilterName[MAX_FILTERS];
+	EHANDLE		m_hFilter[MAX_FILTERS];
+
+	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity );
+	bool PassesDamageFilterImpl(const CTakeDamageInfo &info);
+	void Activate(void);
+};
+
+
+// ###################################################################
+//	> FilterName
+// ###################################################################
+class CFilterName : public CBaseFilter
+{
+	DECLARE_CLASS( CFilterName, CBaseFilter );
+	DECLARE_DATADESC();
+
+public:
+	string_t m_iFilterName;
+
+	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
+	{
+		// special check for !player as GetEntityName for player won't return "!player" as a name
+		if (FStrEq(STRING(m_iFilterName), "!player"))
+		{
+			return pEntity->IsPlayer();
+		}
+		else
+		{
+			return pEntity->NameMatches( STRING(m_iFilterName) );
+		}
+	}
+};
+
+
+// ###################################################################
+//	> FilterClass
+// ###################################################################
+class CFilterClass : public CBaseFilter
+{
+	DECLARE_CLASS( CFilterClass, CBaseFilter );
+	DECLARE_DATADESC();
+
+public:
+	string_t m_iFilterClass;
+
+	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
+	{
+		return pEntity->ClassMatches( STRING(m_iFilterClass) );
+	}
+};
+
+
+// ###################################################################
+//	> FilterTeam
+// ###################################################################
+class FilterTeam : public CBaseFilter
+{
+	DECLARE_CLASS( FilterTeam, CBaseFilter );
+	DECLARE_DATADESC();
+
+public:
+	int		m_iFilterTeam;
+
+	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
+	{
+	 	return ( pEntity->GetTeamNumber() == m_iFilterTeam );
+	}
+};
+
+
+// ###################################################################
+//	> FilterMassGreater
+// ###################################################################
+class CFilterMassGreater : public CBaseFilter
+{
+	DECLARE_CLASS( CFilterMassGreater, CBaseFilter );
+	DECLARE_DATADESC();
+
+public:
+	float m_fFilterMass;
+
+	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
+	{
+		if ( pEntity->VPhysicsGetObject() == NULL )
+			return false;
+
+		return ( pEntity->VPhysicsGetObject()->GetMass() > m_fFilterMass );
+	}
+};
+
+
+// ###################################################################
+//	> FilterDamageType
+// ###################################################################
+class FilterDamageType : public CBaseFilter
+{
+	DECLARE_CLASS( FilterDamageType, CBaseFilter );
+	DECLARE_DATADESC();
+
+protected:
+
+	bool PassesFilterImpl(CBaseEntity *pCaller, CBaseEntity *pEntity )
+	{
+		ASSERT( false );
+	 	return true;
+	}
+
+	bool PassesDamageFilterImpl(const CTakeDamageInfo &info)
+	{
+		//Tony; these are bitflags. check them as so.
+		return ((info.GetDamageType() & m_iDamageType) == m_iDamageType);
+	}
+
+	int m_iDamageType;
+};
+
+
+// ###################################################################
+//	> CFilterEnemy
+// ###################################################################
+
+#define SF_FILTER_ENEMY_NO_LOSE_AQUIRED	(1<<0)
+
+class CFilterEnemy : public CBaseFilter
+{
+	DECLARE_CLASS( CFilterEnemy, CBaseFilter );
+		// NOT SAVED	
+		// m_iszPlayerName
+	DECLARE_DATADESC();
+
+public:
+
+	virtual bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity );
+	virtual bool PassesDamageFilterImpl( const CTakeDamageInfo &info );
+
+private:
+
+	bool	PassesNameFilter( CBaseEntity *pCaller );
+	bool	PassesProximityFilter( CBaseEntity *pCaller, CBaseEntity *pEnemy );
+	bool	PassesMobbedFilter( CBaseEntity *pCaller, CBaseEntity *pEnemy );
+
+	string_t	m_iszEnemyName;				// Name or classname
+	float		m_flRadius;					// Radius (enemies are acquired at this range)
+	float		m_flOuterRadius;			// Outer radius (enemies are LOST at this range)
+	int		m_nMaxSquadmatesPerEnemy;	// Maximum number of squadmates who may share the same enemy
+	string_t	m_iszPlayerName;			// "!player"
+};
+
 #endif // FILTERS_H
