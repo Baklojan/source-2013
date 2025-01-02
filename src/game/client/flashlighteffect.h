@@ -17,10 +17,10 @@ class CFlashlightEffect
 {
 public:
 
-	CFlashlightEffect(int nEntIndex = 0);
+	CFlashlightEffect( int nEntIndex = 0, float flFarZ = 0.0f );
 	~CFlashlightEffect();
 
-	void UpdateLight( const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, bool bTracePlayers );
+	void UpdateLight( const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, float flFarZ, bool bTracePlayers );
 	
 	void TurnOn();
 	void TurnOff();
@@ -43,6 +43,9 @@ protected:
 
 	// Vehicle headlight dynamic light pointer
 	dlight_t *m_pPointLight;
+
+	float m_flFarZ;
+	float m_flLinearAtten;
 
 	float m_flCurrentPullBackDist;
 

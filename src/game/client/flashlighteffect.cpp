@@ -57,12 +57,14 @@ ClientShadowHandle_t g_hFlashlightHandle = CLIENTSHADOW_INVALID_HANDLE;
 //			vecPos - The position of the light emitter.
 //			vecDir - The direction of the light emission.
 //-----------------------------------------------------------------------------
-CFlashlightEffect::CFlashlightEffect(int nEntIndex)
+CFlashlightEffect::CFlashlightEffect( int nEntIndex, float flFarZ )
 {
 	m_FlashlightHandle = CLIENTSHADOW_INVALID_HANDLE;
 	m_nEntIndex = nEntIndex;
 
 	m_flCurrentPullBackDist = 1.0f;
+
+	m_flFarZ = flFarZ;
 
 	m_bIsOn = false;
 	m_pPointLight = NULL;
@@ -140,7 +142,7 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: Do the headlight
 //-----------------------------------------------------------------------------
-void CFlashlightEffect::UpdateLight( const Vector &vecPos, const Vector &vecForward, const Vector &vecRight, const Vector &vecUp, bool bTracePlayers )
+void CFlashlightEffect::UpdateLight( const Vector &vecPos, const Vector &vecForward, const Vector &vecRight, const Vector &vecUp, float flFarZ, bool bTracePlayers )
 {
 	VPROF_BUDGET( __FUNCTION__, VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
@@ -272,7 +274,15 @@ bool CFlashlightEffect::UpdateDefaultFlashlightState( FlashlightState_t& state, 
 	state.m_Color[3] = r_flashlightambient.GetFloat();
 
 	state.m_NearZ = r_flashlightnear.GetFloat() + r_flashlightnearoffsetscale.GetFloat() * m_flCurrentPullBackDist;	// Optionally push near plane out so that we don't clip the world when the flashlight pulls back 
-	state.m_FarZ = r_flashlightfar.GetFloat();
+	//state.m_FarZ = r_flashlightfar.GetFloat();
+	if ( m_flFarZ > 0.0f )
+	{
+		state.m_FarZ = state.m_FarZAtten = m_flFarZ;	// Strictly speaking, these are different, but the game can treat them the same
+	}
+	else
+	{
+		state.m_FarZ = state.m_FarZAtten = r_flashlightfar.GetFloat();	// Strictly speaking, these are different, but the game can treat them the same
+	}
 	state.m_bEnableShadows = r_flashlightdepthtexture.GetBool();
 	state.m_flShadowMapResolution = r_flashlightdepthres.GetInt();
 
