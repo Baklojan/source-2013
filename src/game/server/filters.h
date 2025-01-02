@@ -54,7 +54,7 @@ public:
 protected:
 
 	virtual bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity );
-	virtual bool PassesDamageFilterImpl(const CTakeDamageInfo &info);
+	virtual bool PassesDamageFilterImpl( const CTakeDamageInfo &info );
 };
 
 
@@ -80,8 +80,8 @@ class CFilterMultiple : public CBaseFilter
 	EHANDLE		m_hFilter[MAX_FILTERS];
 
 	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity );
-	bool PassesDamageFilterImpl(const CTakeDamageInfo &info);
-	void Activate(void);
+	bool PassesDamageFilterImpl( const CTakeDamageInfo &info );
+	void Activate( void );
 };
 
 
@@ -99,13 +99,13 @@ public:
 	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
 	{
 		// special check for !player as GetEntityName for player won't return "!player" as a name
-		if (FStrEq(STRING(m_iFilterName), "!player"))
+		if ( FStrEq( STRING( m_iFilterName ), "!player" ) )
 		{
 			return pEntity->IsPlayer();
 		}
 		else
 		{
-			return pEntity->NameMatches( STRING(m_iFilterName) );
+			return pEntity->NameMatches( STRING( m_iFilterName ) );
 		}
 	}
 };
@@ -124,7 +124,7 @@ public:
 
 	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
 	{
-		return pEntity->ClassMatches( STRING(m_iFilterClass) );
+		return pEntity->ClassMatches( STRING( m_iFilterClass ) );
 	}
 };
 
@@ -142,7 +142,7 @@ public:
 
 	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
 	{
-	 	return ( pEntity->GetTeamNumber() == m_iFilterTeam );
+		return ( pEntity->GetTeamNumber() == m_iFilterTeam );
 	}
 };
 
@@ -178,16 +178,16 @@ class FilterDamageType : public CBaseFilter
 
 protected:
 
-	bool PassesFilterImpl(CBaseEntity *pCaller, CBaseEntity *pEntity )
+	bool PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity )
 	{
 		ASSERT( false );
-	 	return true;
+		return true;
 	}
 
-	bool PassesDamageFilterImpl(const CTakeDamageInfo &info)
+	bool PassesDamageFilterImpl( const CTakeDamageInfo &info )
 	{
 		//Tony; these are bitflags. check them as so.
-		return ((info.GetDamageType() & m_iDamageType) == m_iDamageType);
+		return ( ( info.GetDamageType() & m_iDamageType ) == m_iDamageType );
 	}
 
 	int m_iDamageType;
@@ -203,8 +203,8 @@ protected:
 class CFilterEnemy : public CBaseFilter
 {
 	DECLARE_CLASS( CFilterEnemy, CBaseFilter );
-		// NOT SAVED	
-		// m_iszPlayerName
+	// NOT SAVED	
+	// m_iszPlayerName
 	DECLARE_DATADESC();
 
 public:
