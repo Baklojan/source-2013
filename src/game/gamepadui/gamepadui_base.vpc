@@ -12,8 +12,8 @@ $Configuration "Debug"
 {
     $General
     {
-        $OutputDirectory        ".\Debug_$GAMENAME"   [$WINDOWS]
-        $IntermediateDirectory  ".\Debug_$GAMENAME"   [$WINDOWS]
+        $OutputDirectory        ".\Debug_$GAMENAME"   [$WIN32]
+        $IntermediateDirectory  ".\Debug_$GAMENAME"   [$WIN32]
     }
 }
 
@@ -21,8 +21,8 @@ $Configuration "Release"
 {
     $General
     {
-        $OutputDirectory        ".\Release_$GAMENAME"  [$WINDOWS]
-        $IntermediateDirectory  ".\Release_$GAMENAME"  [$WINDOWS]
+        $OutputDirectory        ".\Release_$GAMENAME"  [$WIN32]
+        $IntermediateDirectory  ".\Release_$GAMENAME"  [$WIN32]
     }
 }
 
@@ -45,7 +45,7 @@ $Configuration
         $SystemFrameworks "Carbon" [$OSXALL]
         $SystemLibraries "rt" [$LINUXALL]
         $IgnoreImportLibrary "TRUE"
-        $AdditionalDependencies "$BASE winmm.lib" [$WINDOWS]
+        $AdditionalDependencies "$BASE winmm.lib" [$WIN32]
         $AdditionalDependencies "$BASE wsock32.lib Ws2_32.lib" [$BUILD_REPLAY]
     }
 }
@@ -105,11 +105,6 @@ $Project
         $Lib  tier3
         $Lib  vgui_controls
         $Lib  vtf
-
-		// these are only necessary if HL2_RETAIL is enabled.
-        $ImpLib  steam_api [$HL2_RETAIl]
-        $Lib "$LIBCOMMON/libjpeg" [$HL2_RETAIl]
-		$Lib libpng [$HL2_RETAIl]
 
         $Lib $LIBCOMMON/libcrypto [$POSIX]
 

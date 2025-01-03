@@ -39,14 +39,6 @@
 		"priority"		"3"
 		"family"		"all"
 	}
-	
-	"Achievements"
-	{
-		"text"			"#GameUI_GameMenu_Achievements"
-		"command"		"cmd gamepadui_openachievementsdialog"
-		"priority"		"2"
-		"family"		"all"
-	}
 
 	"Quit"
 	{

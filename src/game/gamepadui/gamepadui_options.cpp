@@ -41,9 +41,6 @@ ConVar _gamepadui_displaymode( "_gamepadui_displaymode", "0", FCVAR_NONE, "", On
 ConVar _gamepadui_resolution( "_gamepadui_resolution", "0" );
 ConVar _gamepadui_sound_quality( "_gamepadui_sound_quality", "0" );
 ConVar _gamepadui_closecaptions( "_gamepadui_closecaptions", "0" );
-#ifdef HL2_RETAIL
-ConVar _gamepadui_hudaspect( "_gamepadui_hudaspect", "0" );
-#endif
 ConVar _gamepadui_skill( "_gamepadui_skill", "0" );
 
 struct GamepadUITab
@@ -372,9 +369,6 @@ public:
 		case KEY_LEFT:
 		case KEY_XBUTTON_LEFT:
 
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-		case STEAMCONTROLLER_DPAD_LEFT:
-#endif
 			if ( --m_nSelectedItem < 0 )
 				m_nSelectedItem = Max( 0, m_Options.Count() - 1 );
 			if ( m_bInstantApply )
@@ -384,9 +378,6 @@ public:
 		case KEY_RIGHT:
 		case KEY_XBUTTON_RIGHT:
 
-#ifdef HL2_RETAIL
-		case STEAMCONTROLLER_DPAD_RIGHT:
-#endif
 			if ( m_Options.Count() )
 				m_nSelectedItem = ( m_nSelectedItem + 1 ) % m_Options.Count();
 			if ( m_bInstantApply )
@@ -536,9 +527,6 @@ public:
 		case KEY_LEFT:
 		case KEY_XBUTTON_LEFT:
 
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-		case STEAMCONTROLLER_DPAD_LEFT:
-#endif
 			m_flValue = Clamp( m_flValue - m_flStep, m_flMin, m_flMax );
 			if ( m_bInstantApply )
 				UpdateConVar();
@@ -547,9 +535,6 @@ public:
 		case KEY_RIGHT:
 		case KEY_XBUTTON_RIGHT:
 
-#ifdef HL2_RETAIL
-		case STEAMCONTROLLER_DPAD_RIGHT:
-#endif
 			m_flValue = Clamp( m_flValue + m_flStep, m_flMin, m_flMax );
 			if ( m_bInstantApply )
 				UpdateConVar();
@@ -923,21 +908,12 @@ int GetCurrentDisplayMode()
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 	if ( config.Windowed() )
 	{
-#ifdef HL2_RETAIL // SDK2013 does not natively support borderless windowed (Madi)
-		if ( config.NoWindowBorder() )
-			return 1;
-#endif
-
 		return 0;
 	}
 
-#ifdef HL2_RETAIL
-	return 2 + GetSDLDisplayIndex();
-#else
 	// TODO FIXME: SDK2013 uses the inverse here...1 is "windowed" and 0 is "fullscreen" in materialsystem.
 	// but our values mean the opposite in gamepadUI code. (Madi)
 	return 1 + GetSDLDisplayIndex();
-#endif
 }
 
 
@@ -964,25 +940,6 @@ int GetCurrentCloseCaptions()
 		return cc_subtitles.GetBool() ? 1 : 2;
 	return 0;
 }
-
-#ifdef HL2_RETAIL
-int GetCurrentHudAspectRatio()
-{
-	ConVarRef hud_aspect( "hud_aspect" );
-	float flHudAspect = hud_aspect.GetFloat();
-	if ( flHudAspect > 0.0f )
-	{
-		if ( flHudAspect < 1.4f )
-			return 1;
-		else if (flHudAspect < 1.7f)
-			return 3;
-		else
-			return 2;
-	}
-	else
-		return 0;
-}
-#endif
 
 int GetCurrentSkill()
 {
@@ -1061,22 +1018,14 @@ void FlushPendingResolution()
 
 	const int nWidth = pOption->userdata.nWidth;
 	const int nHeight = pOption->userdata.nHeight;
-#ifdef HL2_RETAIL
-	const int nWindowed = _gamepadui_displaymode.GetInt() < 2 ? 1 : 0;
-	const int nBorderless = _gamepadui_displaymode.GetInt() == 1 ? 1 : 0;
-#else
+
 	// TODO FIXME: SDK2013 uses the inverse here...1 is "windowed" and 0 is "fullscreen" in materialsystem.
 	// but our values mean the opposite in gamepadUI code. (Madi)
 	const int nWindowed = _gamepadui_displaymode.GetInt() == 1 ? 0 /* fullscreen*/ : 1 /* windowed */;
-#endif
 
 	char szCmd[ 256 ];
 
-#ifdef HL2_RETAIL
-	Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i %i\n", nWidth, nHeight, nWindowed, nBorderless );
-#else
 	Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i\n", nWidth, nHeight, nWindowed );
-#endif
 
 	GamepadUI::GetInstance().GetEngineClient()->ClientCmd_Unrestricted( szCmd );
 }
@@ -1141,31 +1090,6 @@ void FlushPendingCloseCaptions()
 	GamepadUI::GetInstance().GetEngineClient()->ClientCmd_Unrestricted( szCmd );
 }
 
-#ifdef HL2_RETAIL
-void FlushPendingHudAspectRatio()
-{
-	ConVarRef hud_aspect( "hud_aspect" );
-
-	int nHudAspect = _gamepadui_hudaspect.GetInt();
-	switch ( nHudAspect )
-	{
-	default:
-	case 0:
-		hud_aspect.SetValue( 0.0f );
-		break;
-	case 1:
-		hud_aspect.SetValue( 4.0f / 3.0f );
-		break;
-	case 2:
-		hud_aspect.SetValue( 16.0f / 9.0f );
-		break;
-	case 3:
-		hud_aspect.SetValue( 16.0f / 10.0f );
-		break;
-	}
-}
-#endif
-
 void FlushPendingSkill()
 {
 	ConVarRef skill( "skill" );
@@ -1181,9 +1105,6 @@ void UpdateHelperConvars()
 	_gamepadui_displaymode.SetValue( GetCurrentDisplayMode() );
 	_gamepadui_sound_quality.SetValue( GetCurrentSoundQuality() );
 	_gamepadui_closecaptions.SetValue( GetCurrentCloseCaptions() );
-#ifdef HL2_RETAIL
-	_gamepadui_hudaspect.SetValue( GetCurrentHudAspectRatio() );
-#endif
 	_gamepadui_skill.SetValue( GetCurrentSkill() );
 }
 
@@ -1195,9 +1116,6 @@ void FlushHelperConVars()
 	FlushPendingResolution();
 	FlushPendingSoundQuality();
 	FlushPendingCloseCaptions();
-#ifdef HL2_RETAIL
-	FlushPendingHudAspectRatio();
-#endif
 	FlushPendingSkill();
 }
 
@@ -1430,20 +1348,6 @@ void GamepadUIOptionsPanel::OnCommand( char const* pCommand )
 		const char *pszTab = &pCommand[4];
 		if ( *pszTab )
 			SetActiveTab( atoi( pszTab ) );
-	}
-	else if ( !V_strcmp( pCommand, "open_steaminput" ) )
-	{
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-		uint64_t nController = g_pInputSystem->GetActiveSteamInputHandle();
-		if ( !nController )
-		{
-			InputHandle_t nControllers[ STEAM_INPUT_MAX_COUNT ];
-			GamepadUI::GetInstance().GetSteamAPIContext()->SteamInput()->GetConnectedControllers( nControllers );
-			nController = nControllers[0];
-		}
-		if ( nController )
-			GamepadUI::GetInstance().GetSteamAPIContext()->SteamInput()->ShowBindingPanel( nController );
-#endif // HL2_RETAIL
 	}
 	else if ( !V_strcmp( pCommand, "open_techcredits" ) )
 	{
@@ -1701,19 +1605,11 @@ void GamepadUIOptionsPanel::OnKeyCodePressed( vgui::KeyCode code )
 
 	switch ( buttonCode )
 	{
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-		case STEAMCONTROLLER_LEFT_BUMPER:
-#else
 		case KEY_XBUTTON_LEFT_SHOULDER:
-#endif
 			SetActiveTab( GetActiveTab() - 1 );
 			break;
 
-#ifdef HL2_RETAIL
-		case STEAMCONTROLLER_RIGHT_BUMPER:
-#else
 		case KEY_XBUTTON_RIGHT_SHOULDER:
-#endif
 			SetActiveTab( GetActiveTab() + 1 );
 			break;
 		default:
@@ -2003,14 +1899,6 @@ void GamepadUIOptionsPanel::LoadOptionTabs( const char *pszOptionsFile )
 								option.nValue = i++;
 								option.strOptionText = "#GameUI_Windowed";
 								button->AddOptionItem( option );
-
-#ifdef HL2_RETAIL // SDK2013 does not support borderless windowed (Madi)
-								wchar_t wszNoBorderText[ 256 ];
-								V_swprintf_safe( wszNoBorderText, L"%ls (No Border)", option.strOptionText.String() );
-								option.nValue = i++;
-								option.strOptionText = wszNoBorderText;
-								button->AddOptionItem( option );
-#endif // HL2_RETAIL
 
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
 								GamepadUIString strFullscreen = "#GameUI_Fullscreen";

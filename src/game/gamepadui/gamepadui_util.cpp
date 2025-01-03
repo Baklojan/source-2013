@@ -7,12 +7,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// Josh: Unused, but referenced by imageutils.cpp
-// SDK2013: not necessary here (Madi)
-#ifdef HL2_RETAIL
-class IVEngineClient* engine = NULL;
-#endif
-
 // Josh: Copied verbatim from basically every other module
 // we have on this planet.
 const char *COM_GetModDirectory()

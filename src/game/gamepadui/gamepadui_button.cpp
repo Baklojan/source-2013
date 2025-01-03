@@ -161,31 +161,6 @@ int GamepadUIButton::PaintText()
 		nTextPosY = m_flHeight / 2 - nTextSizeY / 2 + m_flTextOffsetY;
 	}
 
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-	if ( g_pInputSystem->IsSteamControllerActive() )
-	{
-		const int nGlyphSize = m_flHeight * 0.80f;
-		if ( m_glyph.SetupGlyph( nGlyphSize, FooterButtons::GetButtonActionHandleString( m_eFooterButton ) ) )
-		{
-			int nGlyphPosX = m_flTextOffsetX;
-			if (m_CenterX)
-			{
-				nGlyphPosX = nTextPosX - m_flHeight / 2;
-				nTextPosX += m_flHeight / 2;
-			}
-			else
-			{
-				nTextPosX += nGlyphSize + (m_flTextOffsetX / 2);
-			}
-			int nGlyphPosY = m_flHeight / 2 - nGlyphSize / 2;
-
-			int nAlpha = 255 * (1.0f - m_flGlyphFade);
-
-			m_glyph.PaintGlyph( nGlyphPosX, nGlyphPosY, nGlyphSize, nAlpha );
-		}
-	}
-#endif // HL2_RETAIL
-
 	if (!m_strButtonText.IsEmpty())
 	{
 		vgui::surface()->DrawSetTextColor(m_colTextColor);
@@ -241,9 +216,6 @@ void GamepadUIButton::OnKeyCodePressed( vgui::KeyCode code )
 	ButtonCode_t buttonCode = GetBaseButtonCode( code );
 	switch ( buttonCode )
 	{
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-	case STEAMCONTROLLER_A:
-#endif
 
 	case KEY_XBUTTON_A:
 	case KEY_ENTER:
@@ -273,9 +245,6 @@ void GamepadUIButton::OnKeyCodeReleased( vgui::KeyCode code )
 	ButtonCode_t buttonCode = GetBaseButtonCode(code);
 	switch ( buttonCode )
 	{
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-	case STEAMCONTROLLER_A:
-#endif
 
 	case KEY_XBUTTON_A:
 	case KEY_ENTER:
@@ -367,11 +336,7 @@ void GamepadUIButton::NavigateFrom()
 
 void GamepadUIButton::OnCursorEntered()
 {
-#ifdef HL2_RETAIL // Steam input and Steam Controller are not supported in SDK2013 (Madi)
-	if ( g_pInputSystem->IsSteamControllerActive() || !IsEnabled() )
-#else
 	if ( !IsEnabled() )
-#endif
 		return;
 
 	BaseClass::OnCursorEntered();

@@ -39,34 +39,49 @@ void GamepadUI::Initialize( CreateInterfaceFn factory )
 
 	CreateInterfaceFn gameuiFactory = s_GameUI.GetFactory();
 	if ( gameuiFactory )
-		m_pGameUI = (IGameUI*) gameuiFactory( GAMEUI_INTERFACE_VERSION, NULL );
+		m_pGameUI = (IGameUI *)gameuiFactory( GAMEUI_INTERFACE_VERSION, NULL );
 
-	m_pAchievementMgr = (IAchievementMgr*) m_pEngineClient->GetAchievementMgr();
+	//m_pAchievementMgr = (IAchievementMgr *)m_pEngineClient->GetAchievementMgr();
 
-	bool bFailed = !m_pEngineClient           ||
-				   !m_pEngineSound            ||
-				   !m_pEngineVGui             ||
-				   !m_pGameUIFuncs            ||
-				   !m_pMaterialSystem         ||
-				   !m_pMaterialSystemSurface  ||
-				   !m_pRenderView             ||
-				   !m_pSoundEmitterSystemBase ||
-				   !m_pGameUI                 ||
-				   !m_pAchievementMgr;
+#ifdef DEBUG
+	bool bFailed = !m_pEngineClient  ||
+		!m_pEngineSound              ||
+		!m_pEngineVGui               ||
+		!m_pGameUIFuncs              ||
+		!m_pMaterialSystem           ||
+		!m_pMaterialSystemSurface    ||
+		!m_pRenderView               ||
+		!m_pSoundEmitterSystemBase   ||
+		!m_pGameUI;
 	if ( bFailed )
 	{
 		GamepadUI_Log( "GamepadUI::Initialize() failed to get necessary interfaces.\n" );
 		return;
 	}
+#else
+	//m_pEngineClient
+	( m_pEngineClient == nullptr ) ? GamepadUI_Log( "m_pEngineClient failed\n" ) : GamepadUI_Log( "m_pEngineClient loaded\n" );
+	//m_pEngineSound
+	( m_pEngineSound == nullptr ) ? GamepadUI_Log( "m_pEngineSound failed\n" ) : GamepadUI_Log( "m_pEngineSound loaded\n" );
+	//m_pEngineVGui
+	( m_pEngineVGui == nullptr ) ? GamepadUI_Log( "m_pEngineVGui failed\n" ) : GamepadUI_Log( "m_pEngineVGui loaded\n" );
+	//m_pGameUIFuncs
+	( m_pGameUIFuncs == nullptr ) ? GamepadUI_Log( "m_pGameUIFuncs failed\n" ) : GamepadUI_Log( "m_pGameUIFuncs loaded\n" );
+	//m_pMaterialSystem
+	( m_pMaterialSystem == nullptr ) ? GamepadUI_Log( "m_pMaterialSystem failed\n" ) : GamepadUI_Log( "m_pMaterialSystem loaded\n" );
+	//m_pMaterialSystemSurface
+	( m_pMaterialSystemSurface == nullptr ) ? GamepadUI_Log( "m_pMaterialSystemSurface failed\n" ) : GamepadUI_Log( "m_pMaterialSystemSurface loaded\n" );
+	//m_pRenderView
+	( m_pRenderView == nullptr ) ? GamepadUI_Log( "m_pRenderView failed\n" ) : GamepadUI_Log( "m_pRenderView loaded\n" );
+	//m_pSoundEmitterSystemBase
+	( m_pSoundEmitterSystemBase == nullptr ) ? GamepadUI_Log( "m_pSoundEmitterSystemBase failed\n" ) : GamepadUI_Log( "m_pSoundEmitterSystemBase loaded\n" );
+	//m_pGameUI
+	( m_pGameUI == nullptr ) ? GamepadUI_Log( "m_pGameUI failed\n" ) : GamepadUI_Log( "m_pGameUI loaded\n" );
+	//m_pAchievementMgr
+	( m_pAchievementMgr == nullptr ) ? GamepadUI_Log( "m_pAchievementMgr failed\n" ) : GamepadUI_Log( "m_pAchievementMgr loaded\n" );
+#endif
 
 	g_pVGuiLocalize->AddFile( "resource/gameui_%language%.txt", "GAME", true );
-	g_pVGuiLocalize->AddFile( "resource/deck_%language%.txt", "GAME", true );
-
-#ifdef HL2_RETAIL // not necessary on SDK2013 (Madi)
-	SteamAPI_InitSafe();
-	SteamAPI_SetTryCatchCallbacks( false );
-	m_SteamAPIContext.Init();
-#endif // HL2_RETAIL
 
 	m_pBasePanel = new GamepadUIBasePanel( GetRootVPanel() );
 	if ( !m_pBasePanel )
@@ -92,10 +107,6 @@ void GamepadUI::Shutdown()
 
 	if ( m_pBasePanel )
 		m_pBasePanel->DeletePanel();
-
-#ifdef HL2_RETAIL // not necessary on SDK2013 (Madi)
-	m_SteamAPIContext.Clear();
-#endif
 
 	ConVar_Unregister();
 	DisconnectTier3Libraries();
