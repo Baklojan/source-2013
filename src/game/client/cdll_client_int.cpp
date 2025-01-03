@@ -129,6 +129,9 @@
 #include "fbxsystem/fbxsystem.h"
 #endif
 
+// GAMEPADUI
+#include "../gamepadui/igamepadui.h"
+
 extern vgui::IInputInternal *g_InputInternal;
 
 //=============================================================================
@@ -141,7 +144,6 @@ extern vgui::IInputInternal *g_InputInternal;
 //=============================================================================
 // HPE_END
 //=============================================================================
-
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -186,6 +188,9 @@ IEngineReplay *g_pEngineReplay = NULL;
 IEngineClientReplay *g_pEngineClientReplay = NULL;
 IReplaySystem *g_pReplay = NULL;
 #endif
+
+// GAMEPADUI
+IGamepadUI* g_pGamepadUI = nullptr;
 
 IHaptics* haptics = NULL;// NVNT haptics system interface singleton
 
@@ -309,6 +314,23 @@ bool g_bTextMode = false;
 class IClientPurchaseInterfaceV2 *g_pClientPurchaseInterface = (class IClientPurchaseInterfaceV2 *)(&g_bTextMode + 156);
 
 static ConVar *g_pcv_ThreadMode = NULL;
+
+// GAMEPADUI TODO - put this somewhere better. (Madi)
+const bool IsSteamDeck()
+{
+	if ( CommandLine()->FindParm( "-gamepadui" ) )
+		return true;
+
+	if ( CommandLine()->FindParm( "-nogamepadui" ) )
+		return false;
+
+	const char *pszSteamDeckEnv = getenv( "SteamDeck" );
+	if ( pszSteamDeckEnv && *pszSteamDeckEnv )
+		return atoi( pszSteamDeckEnv ) != 0;
+
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: interface for gameui to modify voice bans
@@ -836,6 +858,11 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	ClientSteamContext().Activate();
 #endif
 
+#if 1
+	// For now, always use GamepadUI (overridden by -nogamepadui)
+	CommandLine()->AppendParm( "-gamepadui", NULL );
+#endif
+
 	// We aren't happy unless we get all of our interfaces.
 	// please don't collapse this into one monolithic boolean expression (impossible to debug)
 	if ( (engine = (IVEngineClient *)appSystemFactory( VENGINE_CLIENT_INTERFACE_VERSION, NULL )) == NULL )
@@ -1084,6 +1111,41 @@ void CHLClient::PostInit()
 		}
 	}
 #endif
+	// GAMEPADUI
+	if ( IsSteamDeck() )
+	{
+		CSysModule* pGamepadUIModule = g_pFullFileSystem->LoadModule( "gamepadui", "GAMEBIN", false );
+		if ( pGamepadUIModule != nullptr )
+		{
+			GamepadUI_Log( "Loaded gamepadui module.\n" );
+
+			CreateInterfaceFn gamepaduiFactory = Sys_GetFactory( pGamepadUIModule );
+			if ( gamepaduiFactory != nullptr )
+			{
+				g_pGamepadUI = (IGamepadUI*) gamepaduiFactory( GAMEPADUI_INTERFACE_VERSION, NULL );
+				if ( g_pGamepadUI != nullptr )
+				{
+					GamepadUI_Log( "Initializing IGamepadUI interface...\n" );
+
+					factorylist_t factories;
+					FactoryList_Retrieve( factories );
+					g_pGamepadUI->Initialize( factories.appSystemFactory );
+				}
+				else
+				{
+					GamepadUI_Log( "Unable to pull IGamepadUI interface.\n" );
+				}
+			}
+			else
+			{
+				GamepadUI_Log( "Unable to get gamepadui factory.\n" );
+			}
+		}
+		else
+		{
+			GamepadUI_Log( "Unable to load gamepadui module\n" );
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1118,6 +1180,10 @@ void CHLClient::Shutdown( void )
 	UncacheAllMaterials();
 
 	IGameSystem::ShutdownAllSystems();
+
+	// GAMEPADUI
+	if (g_pGamepadUI != nullptr)
+		g_pGamepadUI->Shutdown();
 	
 	gHUD.Shutdown();
 	VGui_Shutdown();
@@ -1164,8 +1230,13 @@ int CHLClient::HudVidInit( void )
 
 	GetClientVoiceMgr()->VidInit();
 
+	// GAMEPADUI
+	if (g_pGamepadUI != nullptr)
+		g_pGamepadUI->VidInit();
+
 	return 1;
 }
+
 
 //-----------------------------------------------------------------------------
 // Method used to allow the client to filter input messages before the 
@@ -1199,6 +1270,10 @@ void CHLClient::HudUpdate( bool bActive )
 	// I don't think this is necessary any longer, but I will leave it until
 	// I can check into this further.
 	C_BaseTempEntity::CheckDynamicTempEnts();
+
+	// GAMEPADUI
+	if (g_pGamepadUI != nullptr)
+		g_pGamepadUI->OnUpdate( frametime );
 }
 
 //-----------------------------------------------------------------------------
@@ -1539,6 +1614,10 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		CReplayRagdollRecorder::Instance().Init();
 	}
 #endif
+
+	// GAMEPADUI
+	if (g_pGamepadUI != nullptr)
+		g_pGamepadUI->OnLevelInitializePreEntity();
 }
 
 
@@ -1550,6 +1629,10 @@ void CHLClient::LevelInitPostEntity( )
 	IGameSystem::LevelInitPostEntityAllSystems();
 	C_PhysPropClientside::RecreateAll();
 	internalCenterPrint->Clear();
+
+	// GAMEPADUI
+	if (g_pGamepadUI != nullptr)
+		g_pGamepadUI->OnLevelInitializePostEntity();
 }
 
 //-----------------------------------------------------------------------------
@@ -1610,6 +1693,10 @@ void CHLClient::LevelShutdown( void )
 	ParticleMgr()->RemoveAllEffects();
 	
 	StopAllRumbleEffects();
+
+	// GAMEPADUI
+	if (g_pGamepadUI != nullptr)
+		g_pGamepadUI->OnLevelShutdown();
 
 	gHUD.LevelShutdown();
 
